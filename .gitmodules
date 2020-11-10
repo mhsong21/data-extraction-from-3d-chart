@@ -1,0 +1,3 @@
+[submodule "CRAFT-pytorch"]
+	path = CRAFT-pytorch
+	url = https://github.com/sniaw21/CRAFT-pytorch.git
