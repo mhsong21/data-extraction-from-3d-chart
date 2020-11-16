@@ -1,7 +1,9 @@
 import math
+import os
 
 import cv2
 import numpy as np
+from PIL import Image
 
 
 def show_wait_destroy(window_name, img):
@@ -11,131 +13,114 @@ def show_wait_destroy(window_name, img):
     cv2.destroyWindow(window_name)
 
 
-def make_kernel_by_theta(theta, length=15):
-    if theta == 0:
-        return np.ones((1, length))
-    elif theta == -90:
-        return np.ones((length, 1))
+def find_point(axis_img, first_direction, second_direction):
+    h, w = axis_img.shape
+    x = -1
+    y = -1
+
+    if first_direction == "bottommost":
+        for i in reversed(range(h)):
+            if np.sum(axis_img[i]) > 0:
+                y = i
+                break
+        candidate = axis_img[i]
+    elif first_direction == "uppermost":
+        for i in range(h):
+            if np.sum(axis_img[i]) > 0:
+                y = i
+                break
+        candidate = axis_img[i]
+    elif first_direction == "leftmost":
+        for j in range(w):
+            if np.sum(axis_img[:, j]) > 0:
+                x = j
+                break
+        candidate = axis_img[:, j]
+    elif first_direction == "rightmost":
+        for j in reversed(range(w)):
+            if np.sum(axis_img[:, j]) > 0:
+                x = j
+                break
+        candidate = axis_img[:, j]
+    else:
+        assert False, "Invalid first direction"
     
+    if second_direction == "bottommost":
+        for i in reversed(range(h)):
+            if candidate[i] > 0:
+                y = i
+                break
+    elif second_direction == "uppermost":
+       for i in range(h):
+            if candidate[i] > 0:
+                y = i
+                break
+    elif second_direction == "leftmost":
+        for j in range(w):
+            if candidate[j] > 0:
+                x = j
+                break
+    elif second_direction == "rightmost":
+        for j in reversed(range(w)):
+            if candidate[j] > 0:
+                x = j
+                break
+    else:
+        assert False, "Invalid first direction"
+
+    if (y != -1) and (x != -1):
+        "x or y is not initialized. x : {}, y : {}".format(x, y)
+    return x, y
+
+
+def make_kernel(theta, length=25):
+    if theta == 0:
+        print("theta : 0")
+        return np.ones((1, 30))
+    elif theta == -90:
+        print("theta : -90")
+        return np.ones((30, 1))
+
     row = math.ceil(np.abs(length * np.sin(theta * np.pi / 180)))
     col = math.ceil(np.abs(length * np.cos(theta * np.pi / 180)))
-    print(theta, row, col)
+    print("theta : ", theta)
+    print("kernel width : ", col)
+    print("kernel height : ", row)
 
     start_index = 0
     if 0 < theta < 45:
         step = float(col) / float(row)
         kernel = np.zeros((row, col), np.uint8)
-        for i in range(row):
+        for i in range(1, row+1):
             index = step * i
-            index_ceiling = math.ceil(index)
-            kernel[i, start_index:index_ceiling+1] = 1
-            start_index = index_ceiling + 1
+            index_ceiling = min(math.ceil(index), col)
+            kernel[i-1, start_index:index_ceiling] = 1
+            start_index = index_ceiling
     elif 45 <= theta < 90:
         step = float(row) / float(col)
         kernel = np.zeros((row, col), np.uint8)
-        for i in range(col):
+        for i in range(1, col+1):
             index = step * i
-            index_ceiling = math.ceil(index)
-            kernel[start_index:index_ceiling+1, i] = 1
-            start_index = index_ceiling + 1
+            index_ceiling = min(math.ceil(index), row)
+            kernel[start_index:index_ceiling, i-1] = 1
+            start_index = index_ceiling
     elif -45 <= theta < 0:
         step = float(col) / float(row)
         kernel = np.zeros((row, col), np.uint8)
-        for i in range(row):
+        for i in range(1, row+1):
             index = step * i
-            index_ceiling = math.ceil(index)
-            kernel[row-1-i, start_index:index_ceiling+1] = 1
-            start_index = index_ceiling + 1
+            index_ceiling = min(math.ceil(index), col)
+            kernel[row-i, start_index:index_ceiling] = 1
+            start_index = index_ceiling
     elif -90 < theta < -45:
         step = float(row) / float(col)
         kernel = np.zeros((row, col), np.uint8)
-        for i in range(col):
+        for i in range(1, col+1):
             index = step * i
-            index_ceiling = math.ceil(index)
-            kernel[start_index:index_ceiling+1, col-1-i] = 1
-            start_index = index_ceiling + 1
+            index_ceiling = min(math.ceil(index), row)
+            kernel[start_index:index_ceiling, col-i] = 1
+            start_index = index_ceiling
     print(kernel)
-    return kernel
-
-
-def make_kernel(row, col, rightdown=True):
-    start_index = 0
-    if rightdown:
-        if col > row:
-            step = float(col) / float(row)
-            kernel = np.zeros((row, col), np.uint8)
-            for i in range(row):
-                index = step * i
-                index_ceiling = math.ceil(index)
-                kernel[i, start_index:index_ceiling+1] = 1
-                start_index = index_ceiling + 1
-        else:
-            step = float(row) / float(col)
-            kernel = np.zeros((row, col), np.uint8)
-            for i in range(col):
-                index = step * i
-                index_ceiling = math.ceil(index)
-                kernel[start_index:index_ceiling+1, i] = 1
-                start_index = index_ceiling + 1
-    else:
-        if col > row:
-            step = float(col) / float(row)
-            kernel = np.zeros((row, col), np.uint8)
-            for i in range(row):
-                index = step * i
-                index_ceiling = math.ceil(index)
-                kernel[row-1-i, start_index:index_ceiling+1] = 1
-                start_index = index_ceiling + 1
-        else:
-            step = float(row) / float(col)
-            kernel = np.zeros((row, col), np.uint8)
-            for i in range(col):
-                index = step * i
-                index_ceiling = math.ceil(index)
-                kernel[start_index:index_ceiling+1, col-1-i] = 1
-                start_index = index_ceiling + 1
-    return kernel
-
-
-def make_kernel_backup(row, col, rightdown=True):
-    if rightdown:
-        if col > row:
-            step = float(col) / float(row)
-            kernel = np.zeros((row, col), np.uint8)
-            for i in range(row):
-                index = step * i
-                index_floor = math.floor(index)
-                index_ceiling = math.ceil(index)
-                kernel[i, index_floor] = 1
-                kernel[i, index_ceiling] = 1
-        else:
-            step = float(row) / float(col)
-            kernel = np.zeros((row, col), np.uint8)
-            for i in range(col):
-                index = step * i
-                index_floor = math.floor(index)
-                index_ceiling = math.ceil(index)
-                kernel[index_floor, i] = 1
-                kernel[index_ceiling, i] = 1
-    else:
-        if col > row:
-            step = float(col) / float(row)
-            kernel = np.zeros((row, col), np.uint8)
-            for i in range(row):
-                index = step * i
-                index_floor = math.floor(index)
-                index_ceiling = math.ceil(index)
-                kernel[row-1-i, index_floor] = 1
-                kernel[row-1-i, index_ceiling] = 1
-        else:
-            step = float(row) / float(col)
-            kernel = np.zeros((row, col), np.uint8)
-            for i in range(col):
-                index = step * i
-                index_floor = math.floor(index)
-                index_ceiling = math.ceil(index)
-                kernel[index_floor, col-1-i] = 1
-                kernel[index_ceiling, col-1-i] = 1
     return kernel
 
 
@@ -182,7 +167,7 @@ def find_frequent_degree(img, edges):
     maxLineGap = 30
 
     lines = cv2.HoughLinesP(edges, 1, np.pi/360, threshold, minLineLength, maxLineGap)
-    print(len(lines))
+    print("detected lines in 'find_frequent_degree' function : ",len(lines))
 
     degree_resolution = 180
     theta_votes = np.zeros(degree_resolution)
@@ -203,18 +188,20 @@ def find_frequent_degree(img, edges):
         end_index = min(i+2, degree_resolution - 1)
         if max(theta_votes[start_index:end_index+1]) <= theta_votes[i]:
             suppression_result[i] = theta_votes[i]
+    for i in range(5):
+        suppression_result[180-1-i] = 0
+    print("suppression_result : ", suppression_result)
     sorted_indices = np.argsort(suppression_result)[::-1]
 
     show_wait_destroy("img", img)
     return sorted_indices[0] - 90, sorted_indices[1] - 90, sorted_indices[2] - 90
 
 
-def find_z_axis(gray):
+def find_axis(gray, degree):
     gray = cv2.bitwise_not(gray)
     bw = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, \
                                 cv2.THRESH_BINARY, 15, -2)
-
-    kernel = np.ones((20, 1))
+    kernel = make_kernel(degree)
 
     result = cv2.erode(bw, kernel)
     result = cv2.dilate(result, kernel)
@@ -224,99 +211,25 @@ def find_z_axis(gray):
 
     h, w = result.shape
 
-    # find leftmost point
-    for j in range(w):
-        if np.sum(result_npy[:, j]) > 0:
-            for i in range(h):
-                if result_npy[i, j] > 0:
-                    point1 = (j, i)  # (x, y)
-                    break
-            for i in range(h):
-                if result_npy[h-1-i, j] > 0:
-                    point2 = (j, h-1-i)  # (x, y)
-                    break
-            break
-
+    if degree == 0:
+        point1 = find_point(result_npy, "bottommost", "leftmost")
+        point2 = find_point(result_npy, "bottommost", "rightmost")
+    elif degree == -90:
+        point1 = find_point(result_npy, "leftmost", "bottommost")
+        point2 = find_point(result_npy, "leftmost", "uppermost")
+    elif 0 < degree < 90:
+        point1 = find_point(result_npy, "bottommost", "rightmost")
+        point2 = find_point(result_npy, "leftmost", "uppermost")
+    elif -90 < degree < 0:
+        point1 = find_point(result_npy, "bottommost", "leftmost")
+        point2 = find_point(result_npy, "rightmost", "uppermost")
     return point1, point2
 
 
-def find_x_axis(gray):
-    gray = cv2.bitwise_not(gray)
-    bw = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, \
-                                cv2.THRESH_BINARY, 15, -2)
-
-    kernel = make_kernel(9, 15)
-    kernel = make_kernel_by_theta(33)
-
-    result = cv2.erode(bw, kernel)
-    result = cv2.dilate(result, kernel)
-    result_npy = np.array(result)
-
-    show_wait_destroy("result", result)
-
-    h, w = result.shape
-
-    # find bottommost point
-    for i in range(h):
-        if np.sum(result_npy[h-1-i]) > 0:
-            for j in range(w):
-                if result_npy[h-1-i, j] > 0:
-                    point1 = (j, h-1-i)  # (x, y)
-                    break
-            break
-    
-    # find leftmost point
-    for j in range(w):
-        if np.sum(result_npy[:, j]) > 0:
-            for i in range(h):
-                if result_npy[h-1-i, j] > 0:
-                    point2 = (j, h-1-i)  # (x, y)
-                    break
-            break
-
-    return point1, point2
-
-
-def find_y_axis(gray):
-    gray = cv2.bitwise_not(gray)
-    bw = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, \
-                                cv2.THRESH_BINARY, 15, -2)
-
-    kernel = make_kernel(5, 15, rightdown=False)
-    kernel = make_kernel_by_theta(-21)
-
-    result = cv2.erode(bw, kernel)
-    result = cv2.dilate(result, kernel)
-    result_npy = np.array(result)
-
-    show_wait_destroy("bw", bw)
-    show_wait_destroy("result", result)
-
-    h, w = result.shape
-
-    # find bottommost point
-    for i in range(h):
-        if np.sum(result_npy[h-1-i]) > 0:
-            for j in range(w):
-                if result_npy[h-1-i, j] > 0:
-                    point1 = (j, h-1-i)  # (x, y)
-                    break
-            break
-
-    # find rightmost point
-    for j in range(w):
-        if np.sum(result_npy[:, w-1-j]) > 0:
-            for i in range(h):
-                if result_npy[h-1-i, w-1-j] > 0:
-                    point2 = (w-1-j, h-1-i)  # (x, y)
-                    break
-            break
-
-    return point1, point2
-
-
-def main(image_path):
+def main(folder_path, img_filename, result_folder_path="../result/"):
+    image_path = folder_path + img_filename
     img = cv2.imread(image_path)
+    img = cv2.resize(img, dsize=(600, 600))
     """
     chart = extract_chart(img, 3)
     chart_gray = cv2.cvtColor(chart, cv2.COLOR_BGR2GRAY)
@@ -329,23 +242,36 @@ def main(image_path):
     gray = remove_color(img, 3)
     bw_not = cv2.bitwise_not(gray)
     show_wait_destroy("bw_not", bw_not)
-    d1, d2, d3 = find_frequent_degree(img, bw_not)
+    degrees = find_frequent_degree(img, bw_not)
 
-    z_axis = find_z_axis(gray)
-    x_axis = find_x_axis(gray)
-    y_axis = find_y_axis(gray)
+    axis_points = []
+    for degree in degrees:
+        axis_points.append(find_axis(gray, degree))
 
-    print(z_axis)
-    print(x_axis)
-    print(y_axis)
+    for i in range(len(axis_points)):
+        print("axis", i, ": ", axis_points[i])
 
-    cv2.line(img, z_axis[0], z_axis[1], (0, 0, 255), 1)
-    cv2.line(img, x_axis[0], x_axis[1], (0, 0, 255), 1)
-    cv2.line(img, y_axis[0], y_axis[1], (0, 0, 255), 1)
+    cv2.line(img, axis_points[0][0], axis_points[0][1], (0, 0, 255), 1)
+    cv2.line(img, axis_points[1][0], axis_points[1][1], (0, 0, 255), 1)
+    cv2.line(img, axis_points[2][0], axis_points[2][1], (0, 0, 255), 1)
     show_wait_destroy("img", img)
+    BGR_to_RGB = np.zeros(img.shape)
+    BGR_to_RGB[:, :, 0] = img[:, :, 2]
+    BGR_to_RGB[:, :, 1] = img[:, :, 1]
+    BGR_to_RGB[:, :, 2] = img[:, :, 0]
+    img_pil = Image.fromarray(BGR_to_RGB.astype(np.uint8))
+    img_pil.save(result_folder_path + img_filename)
+
+
+def iterate_data(folder_path):
+    img_list = os.listdir(folder_path)
+    img_list = [img_file_name for img_file_name in img_list if img_file_name.endswith(".png")]
+    for img_file_name in img_list:
+        main(folder_path, img_file_name)
 
 
 if __name__ == "__main__":
-    main('../data/matlab_three.png')
-    # main('./data/excel_one.png')
+    # main('../data/matlab_three.png')
+    iterate_data("../data/matlab/")
+    # main('../data/Matlab1.png')
     # print(make_kernel(5, 17, False))
