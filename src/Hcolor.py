@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+import sys
 from PIL import Image
 from matplotlib import pyplot as plt
 
@@ -15,7 +16,7 @@ def color_find(img, num_colors):
     
     ##visualize H histogram
     plt.plot(H)
-    #plt.show()
+    plt.show()
     
     ## Background image
     #Assumtion: Background image consist with only white 
@@ -37,16 +38,17 @@ def color_find(img, num_colors):
     return result, background
 
 def main():
-    img_in = Image.open('matlab_chart.png').convert('RGB')
+    filename = sys.argv[1]
+    img_in = Image.open('data/' + filename).convert('RGB')
     img_in.show()
     img = np.array(img_in)
     number_colors = 3
     result, background = color_find(img, number_colors)
     back = Image.fromarray(background)
-    back.save("background.png")
+    back.save("color_divided/background.png")
     for i in range(number_colors):
         res = Image.fromarray(result[i])
-        image_name = "color_%i.png" %i
+        image_name = "color_divided/color_%i.png" %i
         res.save(image_name)
 
 
