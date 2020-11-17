@@ -1,4 +1,4 @@
-import cv2 as cv
+import cv2
 import numpy as np
 import sys
 import scipy.ndimage as ndimage
@@ -8,8 +8,8 @@ from matplotlib import pyplot as plt
 def color_find(img): #, num_colors):
     result = list()
     # Convert BGR to HSV
-    hsv = cv.cvtColor(img, cv.COLOR_BGR2HSV)
-    hist = cv.calcHist( [hsv], [0, 1], None, [180, 256], [0, 180, 0, 256] )
+    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    hist = cv2.calcHist( [hsv], [0, 1], None, [180, 256], [0, 180, 0, 256] )
     
     whites = np.unravel_index(hist.argmax(), hist.shape)
     hist[whites] = 0
@@ -58,8 +58,8 @@ def color_find(img): #, num_colors):
     
     ## Background image
     #Assumtion: Background image consist with only white 
-    back = cv.inRange(hsv, (0, 0, 0), (180, 0, 255))
-    background = cv.bitwise_and(img, img, mask= back)
+    back = cv2.inRange(hsv, (0, 0, 0), (180, 0, 255))
+    background = cv2.bitwise_and(img, img, mask= back)
     # backshow = Image.fromarray(background)                    
     # backshow.show()
     # define range of most colors in HSV
@@ -77,8 +77,8 @@ def color_find(img): #, num_colors):
         clr_low = (int(colors[i][0]-3), int(colors[i][1]-3), 0)
         clr_up  = (int(colors[i][0]+3), int(colors[i][1]+3), 255)
         print(clr_low, clr_up)
-        mask = cv.inRange(hsv, clr_low, clr_up)
-        res = cv.bitwise_and(img,img, mask= mask)
+        mask = cv2.inRange(hsv, clr_low, clr_up)
+        res = cv2.bitwise_and(img,img, mask= mask)
         result.append(res+background)
 
     #result : color bars
