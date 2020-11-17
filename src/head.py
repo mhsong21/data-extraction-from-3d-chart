@@ -1,161 +1,128 @@
 import cv2
 import numpy as np
+from PIL import Image
 import matplotlib
-
-def template_make(c_in):
-    ####
-    # codes for making a template manually
-    ####
-    
-    rgb_image = cv2.imread('chart1.png')
-    '''
-    cv2.imshow('rgb_image',rgb_image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    '''
-    cv2.imwrite('template.png',rgb_image[np.amin(c_in[:,1]) : np.amax(c_in[:,1]) + 1, np.amin(c_in[:,0]): np.amax(c_in[:,0]) + 1, :])
-    
-
 
 def template_matching():
     ####
     # codes for matching the template
     ####
-    src = cv2.imread("chart1.png", cv2.IMREAD_GRAYSCALE)
-    template = cv2.imread("template.png", cv2.IMREAD_GRAYSCALE)
-    dst = cv2.imread("chart1.png")
+    src = cv2.imread("./Matlab8/color_1.png", cv2.IMREAD_COLOR)
+    template = cv2.imread("./Matlab8/template_1.png", cv2.IMREAD_COLOR)
+    dst = cv2.imread("./Matlab8/color_1.png")
 
     result = cv2.matchTemplate(src, template, cv2.TM_CCOEFF_NORMED)
     
     # using threshold
-    threshold = 0.6
-    h, w = template.shape
+    threshold = 0.8
     loc = np.where( result >= threshold)
+    # elements of coord[0] are x-coordinates, coord[1] are y-coordinates
+    coord = np.zeros((2,len(loc[0])))
+    i = 0
+    
     for pt in zip(*loc[::-1]):
-        cv2.rectangle(dst, pt, (pt[0] + w, pt[1] + h), (0,0,255), 1)
-    cv2.imshow("dst", dst)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+        coord[0][i] = pt[0]
+        coord[1][i] = pt[1]
+        i += 1
+    coord = coord.astype(int)
+    #np.sort(coord.view('i8,i8'), order=['f1'], axis=0).view(np.int)
+    # Still, coord has a problem that it has nearby(overlapping) templates.
+    # get rid of nearby templates and save it on the coordinate
     
+    coordinate = coord
+    for i in range(coord.shape[1]):
+        for j in range(coord.shape[1]):
+            if coord[0][j] - 3 <= coord[0][i] <= coord[0][j] + 3:
+                if result[ coord[1][j] ][ coord[0][j] ] > result[ coord[1][i] ][ coord[0][i] ]:
+                    coordinate[:,i] = coord[:,j]
+    coordinate = np.unique(coordinate, axis=1)
     
-    '''
-    # not using threshold, just one matching
-    cv2.imwrite('result.png', result*255)
-    minVal, maxVal, minLoc, maxLoc = cv2.minMaxLoc(result)
-    x, y = minLoc
-    h, w = template.shape
+     # dst is the image which is marked where the template is matched
 
-    dst = cv2.rectangle(dst, (x, y), (x +  w, y + h) , (0, 0, 255), 1)
+    h, w, _ = template.shape
+    for i in range(coordinate.shape[1]):
+            cv2.rectangle(dst, (coordinate[0][i], coordinate[1][i]), (coordinate[0][i] + w, coordinate[1][i] + h), (0,0,255), 1)
+
     cv2.imshow("dst", dst)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    '''
+
+
+    return dst, coordinate
+
     
 def template_finding():
     ####
     # codes for finding a template (head)
     ####
-    src = cv2.imread("chart1.png", cv2.IMREAD_GRAYSCALE)
-    # assume that the deteceted color BGR is [168 38 61], gray scale is 59
-    colorValue = 59
-    colorArea = np.where(src == colorValue, src, 0)
-    
+    color_filtered_img = cv2.imread("./Matlab8/color_1.png", cv2.IMREAD_GRAYSCALE)
+    # assume the deteceted color gray scale value
+    colorValue = color_filtered_img[108][274]
+
+    cv2.imshow("colorfiltered", color_filtered_img)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    colorArea = np.where(color_filtered_img == colorValue, color_filtered_img, 0)
+
+    cv2.imshow("colorArea", colorArea)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
     x = 0
     y = 0
-    # Since legend contains blue color, to avoid these, I chose range starting from index 100
-    for j in range(100, colorArea.shape[0]):
-        if np.amax(colorArea[j,:]) == colorValue:
-            y = j
-            x = np.where(colorArea[j,:] != 0)
-            x = x[0][0]
-            break
-    # the coordinate of blue head top point is saved in x, y
-    
+    # no legend, start from index 50 to avoid matching to chart title 
+    for j in range(50, colorArea.shape[0]):
+        if np.amax(colorArea[j,50:]) == colorValue:
+            a = np.where(colorArea[j,:] != 0)
+            a = a[0][0]
+            if np.amin(colorArea[ j+2 : j+4 , a: a+2]) != 0: 
+                y = j
+                x = a
+                break
+    # the coordinate of head top point is saved in x, y
+    x -= 1
+    y -= 1
     # for calculating the slope of x-axis and y-axis of chart, 
     # I put manually the stating and end points of axes
-    # x-axis: (370, 561) (453, 431)
-    # y-axis: (370, 561) (41,348)
-    x_start = np.array([370, 561]) 
-    x_end = np.array([453, 531])
-    y_start = np.array([370, 561])
-    y_end = np.array([41, 348])
-    
-    x_slope = np.arctan2(x_start[1] - x_end[1], x_start[0] - x_end[0])
-    y_slope = np.arctan2(y_end[1] - y_start[1], y_end[0] - y_start[0])
+    # x-axis: x_start / x_end is the starting / ending points of x-axis respectively.
+    # y-axis: y_start / y_end is the starting / ending points of y-axis respectively.
+    x_start = np.array([572, 562]) 
+    x_end = np.array([653, 366])
+    y_start = np.array([572, 562])
+    y_end = np.array([55, 488])
 
+    x_slope = (x_end[1] - x_start[1]) / (x_end[0] - x_start[0])
+    y_slope = (y_end[1] - y_start[1]) / (y_end[0] - y_start[0])
+
+    if y_slope < 0:
+        temp = y_slope
+        y_slope = x_slope
+        x_slope = y_slope
+    print(x_slope, y_slope)
     # along parrel line to x-axis, find the point where grayscale value of adjacent 5 pixels up and down. 
     for i in range(0, colorArea.shape[1]):
-        if np.amax(colorArea[y - int(i*np.tan(x_slope)) - 2 : y - int(i*np.tan(x_slope)) + 3, x - i]) == 0 :
+        if np.amax(colorArea[y - int(i*x_slope) - 5 : y - int(i*x_slope) + 5, x - i]) == 0 :
             x_alongx = x - i
-            y_alongx = y - int(i*np.tan(x_slope))
+            y_alongx = y - int(i*x_slope)
             break        
-
+    
     # along parrel line to y-axis, find the point where grayscale value of adjacent 5 pixels up and down.
     for i in range(0, colorArea.shape[1]):
-        if np.amax(colorArea[y + int(i*np.tan(y_slope)) - 2 : y + int(i*np.tan(y_slope)) + 3, x + i]) == 0 :
+        if np.amax(colorArea[y + int(i*y_slope) - 5 : y + int(i*y_slope) + 5, x + i]) == 0 :
             x_alongy = x + i
-            y_alongy = y + int(i*np.tan(y_slope))
+            y_alongy = y + int(i*y_slope)
             break 
-
+    print(x,y)
+    print(x_alongx,y_alongx)
+    print(x_alongy,y_alongy)
     template_coord = np.array([[x,y], [x_alongy,y_alongy], [x_alongx,y_alongx], [x_alongx + x_alongy - x, y_alongx + y_alongy - y]])
-    return template_coord
 
-
-def line_detection_1():
-    ####
-    # codes for detecting lines
-    ####
-    src = cv2.imread("chart1.png")
-    dst = src.copy()
-    gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
-    canny = cv2.Canny(gray, 5000, 1500, apertureSize = 7, L2gradient = True)
-    cv2.imshow("canny",canny)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    lines = cv2.HoughLines(canny, 1.0, np.pi / 45, 200, srn = 0, stn = 0, min_theta = -np.pi, max_theta = np.pi)
-
-    for i in lines:
-        rho, theta = i[0][0], i[0][1]
-        a, b = np.cos(theta), np.sin(theta)
-        x0, y0 = a*rho, b*rho
-
-        scale = src.shape[0] + src.shape[1]
-
-        x1 = int(x0 + scale * -b)
-        y1 = int(y0 + scale * a)
-        x2 = int(x0 - scale * -b)
-        y2 = int(y0 - scale * a)
-
-        cv2.line(dst, (x1, y1), (x2, y2), (0, 0, 255), 1)
-        #cv2.circle(dst, (x0, y0), 3, (255, 0, 0), 5, cv2.FILLED)
-
-    cv2.imshow("dst", dst)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()    
-
-def line_detection_2():
-    ####
-    # codes for detecting lines
-    ####
-    src = cv2.imread("chart1.png")
-    dst = src.copy()
-    gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
-    canny = cv2.Canny(gray, 5000, 1500, apertureSize = 7, L2gradient = True)
-    cv2.imshow("canny",canny)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    lines = cv2.HoughLinesP(canny, 1.0, np.pi / 180, 100, minLineLength = 5, maxLineGap = 10)
-    print(lines)
-    for i in lines:
-        cv2.line(dst, (i[0][0], i[0][1]), (i[0][2], i[0][3]), (0, 0, 255), 1)
-
-    cv2.imshow("dst", dst)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    rgb_image = cv2.imread('./Matlab8/color_1.png')
+    template = rgb_image[np.amin(template_coord[:,1]) : np.amax(template_coord[:,1]) + 1, np.amin(template_coord[:,0]): np.amax(template_coord[:,0]) + 1, :]
+    return template
 
 if __name__ == '__main__':
-    #template_matching()
-    #line_detection_2()
-    template_coord = template_finding()
-    template_make(template_coord)
-    template_matching()
+    template = template_finding()
+    cv2.imwrite('./Matlab8/template_1.png',template)
+    matched_image, template_coord = template_matching()
+    cv2.imwrite('./Matlab8/matched_image_1.png',matched_image)
+    print(template_coord)
