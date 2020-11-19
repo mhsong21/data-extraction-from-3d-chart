@@ -44,14 +44,14 @@ def find_point(axis_img, first_direction, second_direction):
         candidate = axis_img[:, j]
     else:
         assert False, "Invalid first direction"
-    
+
     if second_direction == "bottommost":
         for i in reversed(range(h)):
             if candidate[i] > 0:
                 y = i
                 break
     elif second_direction == "uppermost":
-       for i in range(h):
+        for i in range(h):
             if candidate[i] > 0:
                 y = i
                 break
@@ -127,15 +127,15 @@ def make_kernel(theta, length=25):
 def extract_chart(img, num_colors):
     # Convert BGR to HSV
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    hist = cv2.calcHist( [hsv], [0, 1], None, [180, 256], [0, 180, 0, 256] )
-    
-    H = np.sum(hist, axis= 1)
+    hist = cv2.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])
+
+    H = np.sum(hist, axis=1)
     most_colors = np.argpartition(H, -(num_colors+1))
     most_colors.astype(np.uint8)
-    
-    ## Background image
-    #Assumtion: Background image consist with only white 
-    chart_msk = cv2.inRange(hsv, (1, 0,0), (180,255,255))
+
+    # Background image
+    # Assumtion: Background image consist with only white
+    chart_msk = cv2.inRange(hsv, (1, 0, 0), (180, 255, 255))
     chart = cv2.bitwise_and(img, img, mask=chart_msk)
     return chart
 
@@ -143,15 +143,15 @@ def extract_chart(img, num_colors):
 def remove_color(img, num_colors):
     # Convert BGR to HSV
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    hist = cv2.calcHist( [hsv], [0, 1], None, [180, 256], [0, 180, 0, 256] )
-    
-    H = np.sum(hist, axis= 1)
+    hist = cv2.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])
+
+    H = np.sum(hist, axis=1)
     most_colors = np.argpartition(H, -(num_colors+1))
     most_colors.astype(np.uint8)
-    
-    ## Background image
-    #Assumtion: Background image consist with only white 
-    chart = cv2.inRange(hsv, (1, 0,0), (180,255,255))
+
+    # Background image
+    # Assumtion: Background image consist with only white
+    chart = cv2.inRange(hsv, (1, 0, 0), (180, 255, 255))
     removed = cv2.bitwise_or(img, img, mask=~chart)
     removed_gray = cv2.cvtColor(removed, cv2.COLOR_BGR2GRAY)
     removed_gray = removed_gray + chart
@@ -166,14 +166,15 @@ def find_frequent_degree(img, edges):
     minLineLength = 70
     maxLineGap = 30
 
-    lines = cv2.HoughLinesP(edges, 1, np.pi/360, threshold, minLineLength, maxLineGap)
-    print("detected lines in 'find_frequent_degree' function : ",len(lines))
+    lines = cv2.HoughLinesP(edges, 1, np.pi/360,
+                            threshold, minLineLength, maxLineGap)
+    print("detected lines in 'find_frequent_degree' function : ", len(lines))
 
     degree_resolution = 180
     theta_votes = np.zeros(degree_resolution)
     for line in lines:
-        x1,y1,x2,y2 = line[0]
-        cv2.line(img,(x1,y1),(x2,y2),(0,255,0),1)
+        x1, y1, x2, y2 = line[0]
+        cv2.line(img, (x1, y1), (x2, y2), (0, 255, 0), 1)
         slope = (float)(y2 - y1) / (float)(x2 - x1 + 1e-12)
         theta = np.arctan(slope) * 180 / np.pi
         theta = int(np.around(theta))
@@ -199,8 +200,8 @@ def find_frequent_degree(img, edges):
 
 def find_axis(gray, degree):
     gray = cv2.bitwise_not(gray)
-    bw = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, \
-                                cv2.THRESH_BINARY, 15, -2)
+    bw = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
+                               cv2.THRESH_BINARY, 15, -2)
     kernel = make_kernel(degree)
 
     result = cv2.erode(bw, kernel)
@@ -263,11 +264,13 @@ def main(folder_path, img_filename, result_folder_path="../result/"):
     BGR_to_RGB[:, :, 2] = img[:, :, 0]
     img_pil = Image.fromarray(BGR_to_RGB.astype(np.uint8))
     img_pil.save(result_folder_path + img_filename)
+    return axis_points
 
 
 def iterate_data(folder_path):
     img_list = os.listdir(folder_path)
-    img_list = [img_file_name for img_file_name in img_list if img_file_name.endswith(".png")]
+    img_list = [
+        img_file_name for img_file_name in img_list if img_file_name.endswith(".png")]
     for img_file_name in img_list:
         main(folder_path, img_file_name)
 
