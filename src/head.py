@@ -163,9 +163,7 @@ def template_finding(img, res, bar_colors):
     return template
 
 
-if __name__ == '__main__':
-
-    filename = sys.argv[1]
+def run(filename):
     # img_in = Image.open('data/' + filename +'.png').convert('RGB')
     # img_in.show()
     # img = np.array(img_in)
@@ -197,3 +195,8 @@ if __name__ == '__main__':
         image_name = filename+"/matched_image_%i.png" % i
         cv2.imwrite(image_name, matched_image)
     print(template_coordinate)
+
+
+if __name__ == '__main__':
+    filename = sys.argv[1]
+    run(filename)

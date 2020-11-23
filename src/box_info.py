@@ -3,7 +3,6 @@ from PIL import Image
 import pytesseract as ocr
 from enum import Enum
 import cv2
-import matplotlib.pyplot as plt
 
 
 class LineType(Enum):
@@ -11,18 +10,20 @@ class LineType(Enum):
     HORIZONTAL = 2
     NORMAL = 3
 
+OUTLINE_TH = 5
 
 class LineInfo:
     def __init__(self, axis, delta_threshold=3):
         x0, y0, x1, y1 = tuple(map(float, axis))
         self.start = [x0, y0]
         self.end = [x1, y1]
+        self.length = np.sqrt((x1-x0)**2 + (y1-y0)**2)
 
-        if (x1 - x0) <= delta_threshold:
+        if np.abs(x1 - x0) <= delta_threshold:
             a = -1
             b = (x0+x1)/2
             self.type = LineType.VERTICAL
-        elif (y1 - y0) <= delta_threshold:
+        elif np.abs(y1 - y0) <= delta_threshold:
             a = 0
             b = (y0+y1)/2
             self.type = LineType.HORIZONTAL
@@ -43,13 +44,29 @@ class LineInfo:
         xc, yc = box.pos
         a, b = self.equation
         x0, y0 = self.start
+        x1, y1 = self.end
 
         if self.type == LineType.VERTICAL:
-            dist = np.abs(xc - x0)
+            tmp = max(np.abs(yc - y1), np.abs(yc - y0))
+            if tmp > OUTLINE_TH + self.length:
+                dist = 1000
+            else:
+                dist = np.abs(xc - x0)
         elif self.type == LineType.HORIZONTAL:
-            dist = np.abs(yc - y0)
+            tmp = max(np.abs(xc - x1), np.abs(xc - x0))
+            if tmp > OUTLINE_TH + self.length:
+                dist = 1000
+            else:
+                dist = np.abs(yc - y0)
         else:
-            dist = np.abs(a*xc - yc + b) / np.sqrt(a**2 + 1)
+            px = (xc + a*yc - a*b) / (a**2+1)
+            py = a*px + b
+            tmp = max(np.sqrt((px-x0)**2 + (py-y0)**2),
+                      np.sqrt((px-x1)**2 + (py-y1)**2))
+            if tmp > OUTLINE_TH + self.length:
+                dist = 1000
+            else:
+                dist = np.abs(a*xc - yc + b) / np.sqrt(a**2 + 1)
 
         return dist
 
@@ -86,16 +103,21 @@ class BoxInfo:
     def ocr(self, igs, scalar=5):
         test_imgs = []
         x0, y0, x2, y2 = self.box.astype(int)
-        dp = 0
+        if x0 < 0 or y0 < 0 or x2 < 0 or y2 < 0:
+            return None
 
         igs_bin = thresholding(igs)
 
-        box_igs = igs[y0:y2, x0:x2+dp]
-        box_igs_bin = igs_bin[y0:y2, x0:x2+dp]
+        box_igs = igs[y0:y2, x0:x2]
+        box_igs_bin = igs_bin[y0:y2, x0:x2]
 
         box_img = Image.fromarray(box_igs)
         W = box_img.width
         H = box_img.height
+
+        if W <= 0 or H <= 0:
+            return None
+
         test_imgs.append(box_img)
 
         binary_img = Image.fromarray(box_igs_bin)
@@ -110,22 +132,20 @@ class BoxInfo:
         binary_resize = thresholding(np.array(resize))
         test_imgs.append(Image.fromarray(binary_resize))
 
-        # fig, axes = plt.subplots(nrows=2, ncols=3)
-        # axes[0][0].imshow(test_imgs[0], cmap='gray')
-        # axes[0][1].imshow(test_imgs[1], cmap='gray')
-        # axes[0][2].imshow(test_imgs[2], cmap='gray')
-        # axes[1][0].imshow(test_imgs[3], cmap='gray')
-        # axes[1][1].imshow(test_imgs[4], cmap='gray')
-        # plt.show()
+        # cv2.imshow('asd', np.array(test_imgs[0]))
+        # cv2.moveWindow('asd', 500, 0)
+        # cv2.waitKey(0)
+        # cv2.destroyWindow('asd')
 
-        config_str = '--psm 7 -c tessedit_char_whitelist=0123456789'
+        num_config = '--psm 7 -c tessedit_char_whitelist=0123456789'
+        text_config = '--psm 7'
 
         for i, img in enumerate(test_imgs):
-            result = ocr.image_to_string(img, config=config_str)
+            result = ocr.image_to_string(img, config=num_config)
             try:
                 result = int(result)
             except ValueError:
-                result = None
+                result = ocr.image_to_string(img, config=text_config).rstrip()
 
             if result is not None:
                 return result
