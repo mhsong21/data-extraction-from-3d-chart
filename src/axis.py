@@ -196,11 +196,11 @@ def find_axis(gray, degree):
         point1 = find_point(result_npy, "leftmost", "bottommost")
         point2 = find_point(result_npy, "leftmost", "uppermost")
     elif 0 < degree < 90:
-        point1 = find_point(result_npy, "bottommost", "rightmost")
-        point2 = find_point(result_npy, "leftmost", "uppermost")
-    elif -90 < degree < 0:
         point1 = find_point(result_npy, "bottommost", "leftmost")
-        point2 = find_point(result_npy, "rightmost", "uppermost")
+        point2 = find_point(result_npy, "leftmost", "bottommost")
+    elif -90 < degree < 0:
+        point1 = find_point(result_npy, "bottommost", "rightmost")
+        point2 = find_point(result_npy, "rightmost", "bottommost")
     return point1, point2
 
 
