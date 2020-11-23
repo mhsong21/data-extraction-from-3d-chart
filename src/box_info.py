@@ -10,7 +10,9 @@ class LineType(Enum):
     HORIZONTAL = 2
     NORMAL = 3
 
+
 OUTLINE_TH = 5
+
 
 class LineInfo:
     def __init__(self, axis, delta_threshold=3):
@@ -100,11 +102,11 @@ class BoxInfo:
         x0, y0, x2, y2 = self.box
         return [x2-x0, y2-y0]
 
-    def ocr(self, igs, scalar=5):
+    def ocr(self, igs, isNumeric=False, scalar=5):
         test_imgs = []
         x0, y0, x2, y2 = self.box.astype(int)
         if x0 < 0 or y0 < 0 or x2 < 0 or y2 < 0:
-            return None
+            return None, False
 
         igs_bin = thresholding(igs)
 
@@ -116,7 +118,7 @@ class BoxInfo:
         H = box_img.height
 
         if W <= 0 or H <= 0:
-            return None
+            return None, False
 
         test_imgs.append(box_img)
 
@@ -144,8 +146,13 @@ class BoxInfo:
             result = ocr.image_to_string(img, config=num_config)
             try:
                 result = int(result)
+                isNumeric = True
             except ValueError:
+                if isNumeric:
+                    return None, False
                 result = ocr.image_to_string(img, config=text_config).rstrip()
 
             if result is not None:
-                return result
+                return result, isNumeric
+
+        return None, False

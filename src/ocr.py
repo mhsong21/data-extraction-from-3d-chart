@@ -1,5 +1,5 @@
 import numpy as np
-from box_info import BoxInfo, LineInfo
+from box_info import BoxInfo, LineInfo, LineType
 from PIL import Image, ImageDraw
 import matplotlib.pyplot as plt
 
@@ -70,40 +70,48 @@ def tick_to_value(chart_path, box_path, axis_list):
                     if line.line_dist(box) <= tick_thres]
         boxinfos = sorted(boxinfos,
                           key=lambda box: distance(line.start, box.pos))
-        draw_boxes(img, boxinfos, line)
+        # draw_boxes(img, boxinfos, line)
 
         if len(boxinfos) <= 1:
             continue
 
         boxlen_list = [box.length() for box in boxinfos]
-        avg_boxlen = np.max(boxlen_list, axis=0)
+        avg_boxlen = np.max(boxlen_list, axis=0) * 1.4
 
         d_box, delta_pos = find_delta(boxinfos)
         print("{} -> delta {}, {}".format(len(boxinfos), d_box, delta_pos))
 
         tickval_list = []
         tick_pos = line.start
-        tick_idx = 0
-        box_idx = 0
         print("tick pos {}".format(tick_pos))
-        while (box_idx < len(boxinfos)):
-            cur_box = boxinfos[box_idx]
-            dist = distance(cur_box.pos, tick_pos)
-            n = int(dist // d_box)
-            print("dist {} curbox {} curr {} n {}".format(dist, cur_box.pos, tick_pos, n))
-            for i in range(n):
-                curpos = cur_box.pos - (n - i) * delta_pos
-                boxinfo = BoxInfo(pos=curpos, boxlen=avg_boxlen)
-                value = boxinfo.ocr(igs)
-                tickval_list.append(value)
 
-            value = cur_box.ocr(igs)
+        curpos = boxinfos[0].pos
+        isNumeric = False
+
+        for cur_box in boxinfos:
+            value, isNumeric = cur_box.ocr(igs, isNumeric)
             tickval_list.append(value)
-            tick_idx += n + 1
-            box_idx += 1
-            tick_pos += delta_pos * (n + 1)
 
-        print(tickval_list)
+            dist = distance(cur_box.pos, curpos)
+            n = int(dist // d_box)
+            # print("dist {} curbox {} curr {} n {}".format(dist, cur_box.pos, curpos, n))
+            for i in range(n - 1):
+                tick_pos = tick_pos + delta_pos
+                curpos = curpos + delta_pos
+                boxinfo = BoxInfo(pos=curpos, boxlen=avg_boxlen)
+                value, _ = boxinfo.ocr(igs, isNumeric)
+                if value is not None:
+                    tickval_list.append(value)
+
+            curpos = cur_box.pos
+
+        while (True):
+            curpos = curpos + delta_pos
+            boxinfo = BoxInfo(pos=curpos, boxlen=avg_boxlen)
+            value, _ = boxinfo.ocr(igs, isNumeric)
+            if value is None:
+                break
+            tickval_list.append(value)
 
         tickval_per_lines.append(tickval_list)
 
