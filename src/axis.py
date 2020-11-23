@@ -124,37 +124,16 @@ def make_kernel(theta, length=25):
     return kernel
 
 
-def extract_chart(img, num_colors):
-    # Convert BGR to HSV
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    hist = cv2.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])
-
-    H = np.sum(hist, axis=1)
-    most_colors = np.argpartition(H, -(num_colors+1))
-    most_colors.astype(np.uint8)
-
-    # Background image
-    # Assumtion: Background image consist with only white
-    chart_msk = cv2.inRange(hsv, (1, 0, 0), (180, 255, 255))
-    chart = cv2.bitwise_and(img, img, mask=chart_msk)
-    return chart
-
-
 def remove_color(img, num_colors):
     # Convert BGR to HSV
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    hist = cv2.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])
 
-    H = np.sum(hist, axis=1)
-    most_colors = np.argpartition(H, -(num_colors+1))
-    most_colors.astype(np.uint8)
-
-    # Background image
-    # Assumtion: Background image consist with only white
-    chart = cv2.inRange(hsv, (1, 0, 0), (180, 255, 255))
-    removed = cv2.bitwise_or(img, img, mask=~chart)
+    ## Background image
+    #Assumtion: Background image consist with only white 
+    back = cv2.inRange(hsv, (0, 0, 0), (180, 0, 255))
+    removed = cv2.bitwise_or(img, img, mask=back)
     removed_gray = cv2.cvtColor(removed, cv2.COLOR_BGR2GRAY)
-    removed_gray = removed_gray + chart
+    removed_gray = removed_gray + ~back
 
     show_wait_destroy("removed_gray", removed_gray)
 
@@ -210,8 +189,6 @@ def find_axis(gray, degree):
 
     show_wait_destroy("result", result)
 
-    h, w = result.shape
-
     if degree == 0:
         point1 = find_point(result_npy, "bottommost", "leftmost")
         point2 = find_point(result_npy, "bottommost", "rightmost")
@@ -233,14 +210,6 @@ def main(folder_path, img_filename, result_folder_path="../result/"):
     # img = cv2.resize(img, dsize=(600, 600))
     img_in = Image.open(image_path).convert('RGB')
     img = np.array(img_in)
-    """
-    chart = extract_chart(img, 3)
-    chart_gray = cv2.cvtColor(chart, cv2.COLOR_BGR2GRAY)
-    edges = cv2.Canny(chart_gray, 50, 150, apertureSize = 3)
-    show_wait_destroy("edges", edges)
-    find_frequent_degree(img, edges)
-    return
-    """
 
     gray = remove_color(img, 3)
     bw_not = cv2.bitwise_not(gray)
