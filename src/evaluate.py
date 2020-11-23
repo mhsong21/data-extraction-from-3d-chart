@@ -2,23 +2,6 @@ import csv
 import numpy as np
 import pandas as pd
 
-"""
-    gt_f = open(ground_truth_csv_path, 'r', encoding='utf-8')
-    gt_reader = csv.reader(gt_f)
-    gt_data = []
-    for line in gt_reader:
-        gt_data.append(line)
-    gt_f.close()
-
-    predict_f = open(predict_csv_path, 'r', encoding='utf-8')
-    predict_reader = csv.reader(predict_f)
-    predict_data = []
-    for line in predict_reader:
-        predict_data.append(line)
-    predict_f.close()
-    # predict_df = pd.DataFrame(predict_data)
-
-"""
 
 def evaluate(predict_csv_path, ground_truth_csv_path):
     print("----------Ground truth data----------")
