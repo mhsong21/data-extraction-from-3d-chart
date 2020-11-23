@@ -36,7 +36,7 @@ def color_find(img):  # , num_colors):
     for i in range(cnt-1):
         isduplicated = False
         for j in range(i+1, cnt):
-            if abs(colors_temp[i][0] - colors_temp[j][0]) + abs(colors_temp[i][1] - colors_temp[j][1]) < 7:
+            if abs(colors_temp[i][0] - colors_temp[j][0]) + abs(colors_temp[i][1] - colors_temp[j][1]) < 5:
                 num_colors -= 1
                 isduplicated = True
                 break
