@@ -57,12 +57,21 @@ def main(filename):
 
     coord_map = np.zeros((x_len, y_len, 2))
     data_map = np.zeros((x_len, y_len))
+
+    min_delta = 1000
     for i, line in enumerate(bottom_line):
         x_list = template_coordinate[i][0]
         y_list = template_coordinate[i][1]
         points = list(zip(x_list, y_list))
 
-        min_delta, delta_vector = find_delta(points, line)
+        min_delta_c, _ = find_delta(points, line)
+        min_delta = min(min_delta, min_delta_c)
+
+    for i, line in enumerate(bottom_line):
+        x_list = template_coordinate[i][0]
+        y_list = template_coordinate[i][1]
+        points = list(zip(x_list, y_list))
+
         len_points = len(points)
         jd = 0
         for j, point in enumerate(points):
