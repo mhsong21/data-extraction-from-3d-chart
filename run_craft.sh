@@ -1,1 +1,1 @@
-python CRAFT-pytorch/test.py --test_folder='./data' --trained_model='./craft_mlt_25k.pth'
+python CRAFT-pytorch/test.py --test_folder='./data/' --trained_model='./craft_mlt_25k.pth' --file_name='Matlab8.png'

@@ -3,15 +3,19 @@ import axis
 import head
 import sys
 import draw_bottomline
+import subprocess
+import os
 
 
 def main(filename):
-    folder_path = './data/'
     chart_name = filename + '.png'
+    folder_path = os.path.join(os.path.abspath(sys.path[0]), "../data/")
     chart_path = folder_path + chart_name
-    box_path = './CRAFT-pytorch/result/res_' + filename + '.txt'
+    craft_model_path = os.path.join(os.path.abspath(sys.path[0]), "../craft_mlt_25k.pth")
+    subprocess.call(["python", "CRAFT-pytorch/test.py", "--test_folder="+folder_path, "--trained_model="+craft_model_path, "--file_name="+chart_name])
+    box_path = os.path.join(os.path.abspath(sys.path[0]), '../result/res_' + filename + '.txt')
 
-    axis_points, degrees = axis.axis(folder_path, chart_name, result_folder_path='./')
+    axis_points, degrees = axis.axis(folder_path, chart_name)
     print("axis_points")
     print(axis_points)
     print(degrees)
