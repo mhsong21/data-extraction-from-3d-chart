@@ -18,8 +18,7 @@ def template_matching(img, res, template, min_interval, vertex):
     dst = cv2.imread("./Matlab8/color_0.png")
     '''
     src = res
-    cv2.imwrite("matched.png", img)
-    dst = cv2.imread("matched.png")
+    dst = img.copy()
     result = cv2.matchTemplate(src, template, cv2.TM_CCOEFF_NORMED)
 
     # using threshold
