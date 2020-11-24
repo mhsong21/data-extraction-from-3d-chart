@@ -77,6 +77,7 @@ def color_find(img):  # , num_colors):
         clr_up = (int(colors[i][0]+3), int(colors[i][1]+3), 255)
         # print(clr_low, clr_up)
         mask = cv2.inRange(hsv, clr_low, clr_up)
+        mask = cv2.medianBlur(mask,3) 
         height, width = mask.shape
         maxy = 0
         maxx = 0
@@ -86,9 +87,9 @@ def color_find(img):  # , num_colors):
                     maxy = y
                     maxx = x
         res = cv2.bitwise_and(img, img, mask=mask)
+        #res = cv2.medianBlur(res, 3)
         color_order.append((maxy,maxx,res,colors[i]))
-    color_sort = sorted(color_order, key = lambda x:x[0])
-    color_sort = color_sort[::-1]
+    color_sort = sorted(color_order, key = lambda x:x[0], reverse = True)
     bottomline_interval = 0
     bottomline_interval = bottomline_interval +  ((color_sort[0][0] - color_sort[num_colors-1][0])**2 + (color_sort[0][1] - color_sort[num_colors-1][1])**2)**0.5
     bottomline_interval = bottomline_interval/(num_colors-1)
