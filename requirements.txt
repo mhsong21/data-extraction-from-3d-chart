@@ -20,3 +20,4 @@ torch==0.4.1
 torchvision==0.2.1
 scikit-image==0.14.2
 scipy==1.1.0
+pandas>=1.1

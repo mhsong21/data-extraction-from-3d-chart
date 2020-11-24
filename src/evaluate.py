@@ -5,12 +5,12 @@ import pandas as pd
 
 def evaluate(predict_csv_path, ground_truth_csv_path):
     print("----------Ground truth data----------")
-    gt_df = pd.read_csv(ground_truth_csv_path, header=None)
+    gt_df = pd.read_csv(ground_truth_csv_path)
     print(gt_df)
     print("-------------------------------------\n")
 
     print("-----------Predicted data------------")
-    predict_df = pd.read_csv(predict_csv_path, header=None)
+    predict_df = pd.read_csv(predict_csv_path)
     print(predict_df)
     print("-------------------------------------\n")
 
@@ -22,4 +22,4 @@ def evaluate(predict_csv_path, ground_truth_csv_path):
 
 
 if __name__ == "__main__":
-    evaluate("../predict/Matlab16.csv", "../data/ground_truth/Matlab16.csv")
+    evaluate("../predict/Matlab20.csv", "../data/ground_truth/Matlab20.csv")
