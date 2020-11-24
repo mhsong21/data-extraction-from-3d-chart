@@ -16,7 +16,7 @@ def evaluate(predict_csv_path, ground_truth_csv_path):
 
     gt_npy = gt_df.to_numpy()
     error = (gt_df - predict_df).to_numpy()
-    mean_error_rate = np.mean(np.abs(error) / np.abs(gt_npy))
+    mean_error_rate = np.nanmean(np.abs(error) / np.abs(gt_npy))
     print("mean_error_rate : ", format(mean_error_rate * 100, ".3f"), "%")
 
 
