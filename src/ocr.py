@@ -88,7 +88,21 @@ def tick_to_value(chart_path, box_path, axis_list):
         print("tick pos {}".format(tick_pos))
 
         curpos = boxinfos[0].pos
-        isNumeric = False
+        # Check first element is numeric
+        _, isNumeric = boxinfos[0].ocr(igs)
+
+        dist0 = distance(tick_pos, curpos)
+        # dist_offset = dist0 * 0.5
+        n0 = int(dist0 // d_box)
+        print(n0)
+
+        for i in range(n0):
+            curpos = curpos - (i+1) * delta_pos
+            boxinfo = BoxInfo(pos=curpos, boxlen=avg_boxlen)
+            value, _ = boxinfo.ocr(igs, isNumeric)
+            tickval_list.append(value)
+
+        curpos = boxinfos[0].pos
 
         for cur_box in boxinfos:
             value, isNumeric = cur_box.ocr(igs, isNumeric)
