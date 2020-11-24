@@ -81,11 +81,11 @@ def tick_to_value(chart_path, box_path, axis_list):
 
         d_box, delta_pos = find_delta(boxinfos)
         d_box_avg = 0
-        print("{} -> delta {}, {}".format(len(boxinfos), d_box, delta_pos))
+        # print("{} -> delta {}, {}".format(len(boxinfos), d_box, delta_pos))
 
         tickval_list = []
         tick_pos = line.start
-        print("tick pos {}".format(tick_pos))
+        # print("tick pos {}".format(tick_pos))
 
         curpos = boxinfos[0].pos
         # Check first element is numeric
@@ -94,7 +94,7 @@ def tick_to_value(chart_path, box_path, axis_list):
         dist0 = distance(tick_pos, curpos)
         # dist_offset = dist0 * 0.5
         n0 = int(dist0 // d_box)
-        print(n0)
+        # print(n0)
 
         for i in range(n0):
             curpos = curpos - (i+1) * delta_pos

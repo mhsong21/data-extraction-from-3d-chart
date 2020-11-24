@@ -15,8 +15,8 @@ from PIL import Image
 
 
 def draw_bottomline(axis_points, degrees, num_colors, delta_box):
-    dx = (int)(delta_box * math.cos(-degrees[1]/180*math.pi))
-    dy = (int)(delta_box * math.sin(-degrees[1]/180*math.pi))
+    dx = int(round(delta_box * math.cos(-degrees[1]/180*math.pi)))
+    dy = int(round(delta_box * math.sin(-degrees[1]/180*math.pi)))
     jump = (dx, -dy)
     print("delta_box, degree, jump: ", delta_box, degrees[1], jump)
     start = axis_points[2][0]

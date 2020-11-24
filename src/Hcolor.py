@@ -81,18 +81,17 @@ def color_find(img):  # , num_colors):
         maxy = 0
         maxx = 0
         for y in range(height):
-            for x in range(width):
-                if mask[y, x] == 255 and maxy < y:
+            for x in reversed(range(width)):
+                if mask[y,x] == 255 and maxy < y:
                     maxy = y
                     maxx = x
         res = cv2.bitwise_and(img, img, mask=mask)
-        print("maxx, maxy : {} {}".format(maxx, maxy))
-        color_order.append((maxy, maxx, res, colors[i]))
-
-    color_sort = sorted(color_order, key=lambda x: x[0])
+        color_order.append((maxy,maxx,res,colors[i]))
+    color_sort = sorted(color_order, key = lambda x:x[0])
     color_sort = color_sort[::-1]
-    bottomline_interval = (
-        (color_sort[0][0] - color_sort[1][0])**2 + (color_sort[0][1] - color_sort[1][1])**2)**0.5
+    bottomline_interval = 0
+    bottomline_interval = bottomline_interval +  ((color_sort[0][0] - color_sort[num_colors-1][0])**2 + (color_sort[0][1] - color_sort[num_colors-1][1])**2)**0.5
+    bottomline_interval = bottomline_interval/(num_colors-1)
     result = [x[2] for x in color_sort]
     colors = [x[3] for x in color_sort]
     # result : color bars
