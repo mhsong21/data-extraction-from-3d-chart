@@ -1,0 +1,1 @@
+python CRAFT-pytorch/test.py --test_folder='./data' --trained_model='./craft_mlt_25k.pth'

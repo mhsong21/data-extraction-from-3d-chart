@@ -10,7 +10,7 @@ def color_find(img):  # , num_colors):
     result = list()
     # Convert BGR to HSV
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    hist = cv2.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])    
+    hist = cv2.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])
     whites = np.unravel_index(hist.argmax(), hist.shape)
     hist[whites] = 0
     maxi = ndimage.maximum_filter(hist, size=(1, 1))
@@ -51,15 +51,15 @@ def color_find(img):  # , num_colors):
     # H = np.sum(hist, axis= 1)
     # most_colors = np.argpartition(H, -(num_colors+1));
     # most_colors.astype(np.uint8)
-    ##visualize H histogram
-    #plt.plot(H)
-    #plt.show()
-    
-    ## Background image
-    #Assumtion: Background image consist with only white 
+    # visualize H histogram
+    # plt.plot(H)
+    # plt.show()
+
+    # Background image
+    # Assumtion: Background image consist with only white
     back = cv2.inRange(hsv, (0, 0, 0), (180, 0, 255))
     background = cv2.bitwise_and(img, img, mask=back)
-    # backshow = Image.fromarray(background)                    
+    # backshow = Image.fromarray(background)
     # backshow.show()
     # define range of most colors in HSV
     # for i in range(num_colors):
@@ -75,7 +75,7 @@ def color_find(img):  # , num_colors):
     for i in range(num_colors):
         clr_low = (int(colors[i][0]-3), int(colors[i][1]-3), 0)
         clr_up = (int(colors[i][0]+3), int(colors[i][1]+3), 255)
-        print(clr_low, clr_up)
+        # print(clr_low, clr_up)
         mask = cv2.inRange(hsv, clr_low, clr_up)
         height, width = mask.shape
         maxy = 0
@@ -107,7 +107,8 @@ def main():
     img_in = Image.open('data/' + filename + '.png').convert('RGB')
     # img_in.show()
     img = np.array(img_in)
-    result, background, number_colors, bar_colors, bottomline_interval = color_find(img)
+    result, background, number_colors, bar_colors, bottomline_interval = color_find(
+        img)
     # , number_colors)
     back = Image.fromarray(background)
     back.save("color_divided/" + filename + "background.png")

@@ -7,7 +7,7 @@ import scipy.ndimage as ndimage
 import Hcolor
 
 
-def template_matching(img, res, template, min_interval):
+def template_matching(img, res, template, min_interval, vertex):
     ####
     # codes for matching the template
     ####
@@ -78,7 +78,10 @@ def template_matching(img, res, template, min_interval):
     for i in range(coordinate.shape[1]):
         cv2.rectangle(dst, (coordinate[0][i], coordinate[1][i]),
                       (coordinate[0][i] + w, coordinate[1][i] + h), (0, 0, 255), 1)
-
+    
+    for i in range(coordinate.shape[1]):
+        coordinate[:,i] += vertex
+    
     cv2.imshow("dst", dst)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
@@ -137,17 +140,17 @@ def template_finding(img, res, bar_colors, axis_list):
     if y_slope < 0:
         y_slope = x_slope
         x_slope = y_slope
-
+    
     # along parrel line to x-axis, find the point where grayscale value of adjacent 5 pixels up and down.
     for i in range(0, colorArea.shape[1]):
-        if np.amax(colorArea[y - int(i*x_slope) - 7: y - int(i*x_slope) + 7, x - i]) == 0:
+        if np.amax(colorArea[y - int(i*x_slope): y - int(i*x_slope) + 6, x - i]) == 0:#np.amax(colorArea[y - int(i*x_slope): y - int(i*x_slope) + 6, x - i]) == 0:
             x_alongx = x - i
             y_alongx = y - int(i*x_slope)
             break
 
     # along parrel line to y-axis, find the point where grayscale value of adjacent 5 pixels up and down.
     for i in range(0, colorArea.shape[1]):
-        if np.amax(colorArea[y + int(i*y_slope) - 7: y + int(i*y_slope) + 7, x + i]) == 0:
+        if np.amax(colorArea[y + int(i*y_slope): y + int(i*y_slope) + 6, x + i]) == 0:#np.amax(colorArea[y + int(i*y_slope): y + int(i*y_slope) + 6, x + i]) == 0:
             x_alongy = x + i
             y_alongy = y + int(i*y_slope)
             break
@@ -156,11 +159,15 @@ def template_finding(img, res, bar_colors, axis_list):
                               x_alongx + x_alongy - x, y_alongx + y_alongy - y]])
     template = res[np.amin(template_coord[:, 1]): np.amax(
         template_coord[:, 1]) + 1, np.amin(template_coord[:, 0]): np.amax(template_coord[:, 0]) + 1, :]
-
+    
+    vertex = np.array([x_alongy - x, template.shape[0]])
+    
     cv2.imshow("template", template)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    return template
+    # template: head template image
+    # vertex: coordinate difference between the bottom vertex and the template left-top vertex
+    return template, vertex
 
 
 def run(filename, axis_list):
@@ -168,7 +175,7 @@ def run(filename, axis_list):
     # img_in.show()
     # img = np.array(img_in)
     img = cv2.imread('data/' + filename + '.png', cv2.IMREAD_COLOR)
-    result, background, number_colors, bar_colors = Hcolor.color_find(img) # , number_colors)
+    result, background, number_colors, bar_colors, _ = Hcolor.color_find(img) # , number_colors)
     back = Image.fromarray(background)
     back.save("color_divided/" + filename + "background.png")
 
@@ -180,23 +187,26 @@ def run(filename, axis_list):
         image_name = "color_divided/"+filename+"color_%i.png" % i
         res.save(image_name)
 
-        template = template_finding(img, result[i], bar_colors[i], axis_list)
+        template, vertex = template_finding(img, result[i], bar_colors[i], axis_list)
         image_name = filename+"/template_%i.png" % i
         cv2.imwrite(image_name, template)
 
         _, _, min_interval = template_matching(
-            img, result[i], template, min_interval)
+            img, result[i], template, min_interval, vertex)
 
     for i in range(number_colors):
         template = cv2.imread(filename+"/template_%i.png" % i)
         matched_image, coord, min_interval = template_matching(
-            img, result[i], template, min_interval)
+            img, result[i], template, min_interval, vertex)
         template_coordinate.append(coord)
         image_name = filename+"/matched_image_%i.png" % i
         cv2.imwrite(image_name, matched_image)
+    # template_coordinate is the bottom vertex coordinate of the detected head
     print(template_coordinate)
 
 
 if __name__ == '__main__':
     filename = sys.argv[1]
+    #axis_list = np.array([[[0,0],[0,0]],[[573,561] , [652,366]],[[573,561] , [55, 488]]])
+    #run(filename, axis_list)
     run(filename)
