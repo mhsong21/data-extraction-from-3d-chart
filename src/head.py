@@ -176,7 +176,7 @@ def template_finding(img, res, bar_colors, axis_list):
 def run(filename, axis_list):
     if not os.path.isdir('./temp'):
         os.mkdir('./temp')
-    folder = './temp' + filename
+    folder = './temp/' + filename
     if not os.path.isdir(folder):
         os.mkdir(folder)
     # img_in = Image.open('data/' + filename +'.png').convert('RGB')
