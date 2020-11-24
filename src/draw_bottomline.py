@@ -6,6 +6,8 @@ import axis
 import sys
 import cv2
 from PIL import Image
+from box_info import LineInfo
+
 
 # INPUT
 # axis_points : list of (start,end). Ordered in z, 계열, rest (from axis.py)
@@ -40,5 +42,7 @@ def main(filename, axis_points, degrees, dbox):
     for lines in bottom_line:
         print(lines)
         img = cv2.line(img, lines[0], lines[1], (0, 0, 255), 1)
-    axis.show_wait_destroy("img_with_bottomlines", img)
-    return bottom_line
+    # axis.show_wait_destroy("img_with_bottomlines", img)
+
+    lineinfos = [LineInfo(x[0] + x[1]) for x in bottom_line]
+    return lineinfos
