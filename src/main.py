@@ -5,6 +5,13 @@ import sys
 import draw_bottomline
 import subprocess
 import os
+import csv
+import pandas as pd
+
+
+def save_predict_as_csv(x_label, y_label, data, save_path):
+    df = pd.DataFrame(data, header=x_label, index=y_label)
+    df.to_csv(save_path)
 
 
 def main(filename):
