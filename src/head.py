@@ -74,7 +74,7 @@ def template_matching(img, res, template, min_interval, vertex):
     coord = coordinate
     for i in range(coord.shape[1]):
         for j in range(coord.shape[1]):
-            if coord[0][j] - template.shape[1] <= coord[0][i] <= coord[0][j] + template.shape[1]:
+            if coord[0][j] - template.shape[1] - 5 <= coord[0][i] <= coord[0][j] + template.shape[1] + 5:
                 if result[coord[1][j]][coord[0][j]] > result[coord[1][i]][coord[0][i]]:
                     coordinate[:, i] = coord[:, j]
     coordinate = np.unique(coordinate, axis=1)
@@ -95,7 +95,7 @@ def template_matching(img, res, template, min_interval, vertex):
     return dst, coordinate, min_interval
 
 
-def template_finding(img, res, bar_colors, axis_list):
+def template_finding(img, res, bar_colors):
     ####
     # codes for finding a template (head)
     ####
@@ -138,19 +138,7 @@ def template_finding(img, res, bar_colors, axis_list):
     # I put manually the stating and end points of axes
     # x-axis: x_start / x_end is the starting / ending points of x-axis respectively.
     # y-axis: y_start / y_end is the starting / ending points of y-axis respectively.
-
-    x_start = axis_list[1][0]
-    x_end = axis_list[1][1]
-    y_start = axis_list[2][0]
-    y_end = axis_list[2][1]
-
-    x_slope = (x_end[1] - x_start[1]) / (x_end[0] - x_start[0])
-    y_slope = (y_end[1] - y_start[1]) / (y_end[0] - y_start[0])
-
-    if y_slope < 0:
-        y_slope = x_slope
-        x_slope = y_slope
-
+    
     x_temp = x
     y_temp = y
     x_max = x - 1
@@ -207,7 +195,7 @@ def edge_enhance(igs):
 
     return new_igs
 
-def run(filename, axis_list):
+def run(filename):
     if not os.path.isdir('./temp'):
         os.mkdir('./temp')
     folder = './temp/' + filename
@@ -234,7 +222,7 @@ def run(filename, axis_list):
         res.save(image_name)
 
         template, vertex = template_finding(
-            img, result[i], bar_colors[i], axis_list)
+            img, result[i], bar_colors[i])
         image_name = folder+"/template_%i.png" % i
         cv2.imwrite(image_name, template)
 
@@ -255,6 +243,4 @@ def run(filename, axis_list):
 
 if __name__ == '__main__':
     filename = sys.argv[1]
-    #axis_list = np.array([[[0,0],[0,0]],[[573,561] , [652,366]],[[573,561] , [55, 488]]])
-    #run(filename, axis_list)
     run(filename)
