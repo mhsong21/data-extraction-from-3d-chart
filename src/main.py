@@ -14,6 +14,7 @@ import math
 
 def save_predict_as_csv(x_label, y_label, data, save_path):
     df = pd.DataFrame(data, header=x_label, index=y_label)
+    print(df)
     df.to_csv(save_path)
 
 
