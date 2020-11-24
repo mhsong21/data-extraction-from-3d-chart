@@ -23,6 +23,7 @@ def template_matching(img, res, template, min_interval, vertex):
     # using threshold
     threshold = 0.7
     loc = np.where(result >= threshold)
+
     # elements of coord[0] are x-coordinates, coord[1] are y-coordinates
     coord = np.zeros((2, len(loc[0])))
     i = 0
@@ -43,6 +44,11 @@ def template_matching(img, res, template, min_interval, vertex):
                 if result[coord[1][j]][coord[0][j]] > result[coord[1][i]][coord[0][i]]:
                     coordinate[:, i] = coord[:, j]
     coordinate = np.unique(coordinate, axis=1)
+
+    if coordinate.shape[1] <= 1:
+        coordinate[:,0] += vertex
+        return dst, coordinate, min_interval
+
 
     if coordinate.shape[0] > 1:
         for i in range(coordinate.shape[0]-1):
@@ -103,23 +109,27 @@ def template_finding(img, res, bar_colors, axis_list):
     cv2.waitKey(0)
     cv2.destroyAllWindows()
     '''
-    colorArea = np.where(hsv[:, :, 0] == colorValue_H,
-                         hsv[:, :, 0], 0)  # 진환이가 만들어준 남은 이미지들로 바꾸기
-    '''
+    colorArea = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
+    #colorArea = cv2.medianBlur(colorArea, 3)
+    #colorArea = np.where(hsv[:, :, 0] == colorValue_H,
+    #                     hsv[:, :, 0], 0)  # 진환이가 만들어준 남은 이미지들로 바꾸기
+    
+
     cv2.imshow("colorArea", colorArea)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    '''
+
     x = 0
     y = 0
     # no legend, start from index 50 to avoid matching to chart title
     for j in range(0, colorArea.shape[0]):
-        if np.amax(colorArea[j, :]) == colorValue_H:
+        #if np.amax(colorArea[j, :]) == colorValue_H:
+        if np.amax(colorArea[j, :]) != 0:
             x = np.where(colorArea[j, :] != 0)
             x = x[0][0]
             y = j
             break
-
+    print(x,y)
     # the coordinate of head top point is saved in x, y
     # x -= 1
     # y -= 1
@@ -140,19 +150,7 @@ def template_finding(img, res, bar_colors, axis_list):
     if y_slope < 0:
         y_slope = x_slope
         x_slope = y_slope
-    '''
-    x_temp = x
-    y_temp = y
-    while colorArea[y_temp][x_temp] != 0:
-        for i in range(0, colorArea.shape[1]):
-            x_temp += 1
-            if colorArea[y_temp][x_temp] == 0:
-                x_temp -= 1
-                break
-        y_temp += 1
-    x_alongy = x_temp
-    y_alongy = y_temp
-    '''
+
     x_temp = x
     y_temp = y
     x_max = x - 1
@@ -188,21 +186,6 @@ def template_finding(img, res, bar_colors, axis_list):
     x_alongx = x_min
     y_alongx = y_temp
 
-    '''
-    # along parrel line to x-axis, find the point where grayscale value of adjacent 5 pixels up and down.
-    for i in range(0, colorArea.shape[1]):
-        if np.amax(colorArea[y - int(i*x_slope): y - int(i*x_slope) + 6, x - i]) == 0:#np.amax(colorArea[y - int(i*x_slope): y - int(i*x_slope) + 6, x - i]) == 0:
-            x_alongx = x - i
-            y_alongx = y - int(i*x_slope)
-            break
-
-    # along parrel line to y-axis, find the point where grayscale value of adjacent 5 pixels up and down.
-    for i in range(0, colorArea.shape[1]):
-        if np.amax(colorArea[y + int(i*y_slope): y + int(i*y_slope) + 6, x + i]) == 0:#np.amax(colorArea[y + int(i*y_slope): y + int(i*y_slope) + 6, x + i]) == 0:
-            x_alongy = x + i
-            y_alongy = y + int(i*y_slope)
-            break
-    '''
     template_coord = np.array([[x, y], [x_alongy, y_alongy], [x_alongx, y_alongx], [
                               x_alongx + x_alongy - x, y_alongx + y_alongy - y]])
     template = res[np.amin(template_coord[:, 1]): np.amax(
@@ -216,18 +199,13 @@ def template_finding(img, res, bar_colors, axis_list):
     # template: head template image
     # vertex: coordinate difference between the bottom vertex and the template left-top vertex
     return template, vertex
-
-
+    
 def edge_enhance(igs):
     new_igs = np.copy(igs)
+    kernel = np.ones((3,3), np.uint8)
+    new_igs = cv2.erode(igs, kernel)
 
-    H, W, _ = igs.shape
-    for y in range(1, H-1):
-        for x in range(1, W-1):
-            if np.all(igs[y, x] == 0):
-                new_igs[y-1:y+2, x-1:x+2, :] = 0
     return new_igs
-
 
 def run(filename, axis_list):
     if not os.path.isdir('./temp'):
@@ -246,6 +224,7 @@ def run(filename, axis_list):
 
     template_coordinate = list()
     min_interval = 5000
+
     for i, igs in enumerate(result):
         result[i] = edge_enhance(igs)
 
@@ -276,6 +255,6 @@ def run(filename, axis_list):
 
 if __name__ == '__main__':
     filename = sys.argv[1]
-    axis_list = np.array([[[0,0],[0,0]],[[573,561] , [652,366]],[[573,561] , [55, 488]]])
-    run(filename, axis_list)
-    #run(filename)
+    #axis_list = np.array([[[0,0],[0,0]],[[573,561] , [652,366]],[[573,561] , [55, 488]]])
+    #run(filename, axis_list)
+    run(filename)
