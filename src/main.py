@@ -48,7 +48,7 @@ def main(filename):
             tick_val = float(z1 - z0)
             break
     bottom_line = draw_bottomline.main(filename, axis_points, degrees, dbox)
-    template_coordinate = head.run(filename, axis_points)
+    template_coordinate = head.run(filename)
 
     x_len = len(bottom_line)
     y_len = -1
