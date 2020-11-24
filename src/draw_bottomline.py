@@ -30,11 +30,11 @@ def draw_bottomline(axis_points, degrees, num_colors, delta_box):
 
 def main():
     filename = 'Matlab3'
-    img_in = Image.open('../data/matlab/' + filename + '.png').convert('RGB')
+    img_in = Image.open('data/' + filename + '.png').convert('RGB')
     img = np.array(img_in)
-    result, background, num_colors, bar_colors = Hcolor.color_find(img)
-    axis_points, degrees = axis.main("../data/matlab/", filename + '.png', '../result/' )
-    delta_box = ocr.tick_to_value('../data/matlab/' + filename + '.png', '../CRAFT-pytorch/result/res_Matlab3.txt', (axis_points[0], axis_points[1]), (4,5))
+    result, background, num_colors, bar_colors,delta_box = Hcolor.color_find(img)
+    axis_points, degrees = axis.main("data/matlab/", filename + '.png', 'result/' )
+    #delta_box = ocr.tick_to_value('../data/matlab/' + filename + '.png', '../CRAFT-pytorch/result/res_Matlab3.txt', (axis_points[0], axis_points[1]), (4,5))
     bottom_line = draw_bottomline(axis_points, degrees, num_colors, (0,66,0))
     
     for lines in bottom_line:

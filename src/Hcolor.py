@@ -71,20 +71,32 @@ def color_find(img):  # , num_colors):
 
     # res_out = Image.fromarray(res + background)
     # res_out.show()
-
+    color_order = []
     for i in range(num_colors):
         clr_low = (int(colors[i][0]-3), int(colors[i][1]-3), 0)
         clr_up = (int(colors[i][0]+3), int(colors[i][1]+3), 255)
         print(clr_low, clr_up)
         mask = cv2.inRange(hsv, clr_low, clr_up)
+        height, width = mask.shape
+        maxy = 0
+        maxx = 0
+        for y in range(height):
+            for x in range(width):
+                if mask[y,x] == 255 and maxy < y:
+                    maxy = y
+                    maxx = x
         res = cv2.bitwise_and(img, img, mask=mask)
-        result.append(res+background)
+        color_order.append((maxy,maxx,res))
 
+    color_sort = sorted(color_order, key = lambda x:x[0])
+    bottomline_interval = ((color_sort[0][0] - color_sort[1][0])**2 + (color_sort[0][1] - color_sort[1][1])**2)**0.5
+    result = [x[2] for x in color_sort]
     # result : color bars
     # background : background with no bars
     # num_colors : number of color bars
     # colors : Bars color value in list of tuple (H,S)
-    return result, background, num_colors, colors
+    print(bottomline_interval)
+    return result, background, num_colors, colors, bottomline_interval
 
 
 def main():
@@ -92,7 +104,7 @@ def main():
     img_in = Image.open('data/' + filename + '.png').convert('RGB')
     # img_in.show()
     img = np.array(img_in)
-    result, background, number_colors, bar_colors = color_find(img)
+    result, background, number_colors, bar_colors, bottomline_interval = color_find(img)
     # , number_colors)
     back = Image.fromarray(background)
     back.save("color_divided/" + filename + "background.png")
