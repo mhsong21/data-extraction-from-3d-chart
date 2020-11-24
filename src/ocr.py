@@ -63,6 +63,7 @@ def tick_to_value(chart_path, box_path, axis_list):
     box_data = read_boxes(box_path)
     box_candidates = list(map(BoxInfo, box_data))
 
+    dbox_list = []
     tickval_per_lines = []
     lineinfos = map(LineInfo, axis_list)
     for line in lineinfos:
@@ -79,6 +80,7 @@ def tick_to_value(chart_path, box_path, axis_list):
         avg_boxlen = np.max(boxlen_list, axis=0) * 1.4
 
         d_box, delta_pos = find_delta(boxinfos)
+        d_box_avg = 0
         print("{} -> delta {}, {}".format(len(boxinfos), d_box, delta_pos))
 
         tickval_list = []
@@ -102,6 +104,7 @@ def tick_to_value(chart_path, box_path, axis_list):
                 value, _ = boxinfo.ocr(igs, isNumeric)
                 if value is not None:
                     tickval_list.append(value)
+            d_box_avg = d_box_avg + dist
 
             curpos = cur_box.pos
 
@@ -113,6 +116,8 @@ def tick_to_value(chart_path, box_path, axis_list):
                 break
             tickval_list.append(value)
 
+        d_box_avg = d_box_avg / (len(boxinfos) - 1)
+        dbox_list.append(d_box_avg)
         tickval_per_lines.append(tickval_list)
 
-    return tickval_per_lines
+    return tickval_per_lines, dbox_list
