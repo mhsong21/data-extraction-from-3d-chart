@@ -1,0 +1,283 @@
+[33mcommit 6c3fcd8a358f0c75a1575cb6aaf07f5043b48c12[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: taxis <taxis853@gmail.com>
+Date:   Tue Nov 24 16:12:35 2020 +0900
+
+    head.py modified for Matlab8.png
+
+[33mcommit 9815c2680f28f866622ed6863863f32d7d76cb4f[m
+Author: mhsong <sniaw21@gmail.com>
+Date:   Tue Nov 24 15:25:53 2020 +0900
+
+    Implement for Matlab8
+
+[33mcommit 8b0e00c7e312187eb69b405bd13df06a861c02e5[m
+Author: elzino <elzinomaster@gmail.com>
+Date:   Tue Nov 24 15:12:14 2020 +0900
+
+    changed the csv format
+
+[33mcommit d34d414f96e8910ea5e1544d06e0849279216093[m
+Author: elzino <elzinomaster@gmail.com>
+Date:   Tue Nov 24 14:57:33 2020 +0900
+
+    remove matched.png code
+
+[33mcommit 088a962c1e4a1cb27ace4afa78c10b4e8bf15146[m
+Author: elzino <elzinomaster@gmail.com>
+Date:   Tue Nov 24 14:51:04 2020 +0900
+
+    add empty color_divided folder
+
+[33mcommit c01a50f5ccb3cc581ae76d7b6ed578a4409bdaaa[m
+Merge: 4ddb9ea d80bd2d
+Author: elzino <elzinomaster@gmail.com>
+Date:   Tue Nov 24 14:37:25 2020 +0900
+
+    Merge branch 'main' of github.com:sniaw21/cv_project into main
+
+[33mcommit 4ddb9ea9195b20ba4e914da3ba7c12a3251c8391[m
+Author: elzino <elzinomaster@gmail.com>
+Date:   Tue Nov 24 14:37:08 2020 +0900
+
+    includ craft in our script
+
+[33mcommit d80bd2d493059c5c41f311fdd6295874574eb8ea[m
+Author: mhsong <sniaw21@gmail.com>
+Date:   Tue Nov 24 14:33:49 2020 +0900
+
+    fix folder path and remove temp image files
+
+[33mcommit b397218c31adb615b7bc72202240e1e2dea7e954[m
+Merge: a0ebbc7 d77aa89
+Author: elzino <elzinomaster@gmail.com>
+Date:   Tue Nov 24 14:34:08 2020 +0900
+
+    Merge branch 'main' of github.com:sniaw21/cv_project into main
+
+[33mcommit d77aa890d61fcb6de829789cd2977ae44d81efc1[m
+Author: mhsong <sniaw21@gmail.com>
+Date:   Tue Nov 24 14:30:44 2020 +0900
+
+    Add folders
+
+[33mcommit a0ebbc7041117fd934dd42c1df29334974dec3c2[m
+Author: elzino <elzinomaster@gmail.com>
+Date:   Tue Nov 24 14:29:27 2020 +0900
+
+    changed submodule
+
+[33mcommit 1183b44b3388be6cdcc78c558abf88913df2737f[m
+Author: mhsong <sniaw21@gmail.com>
+Date:   Tue Nov 24 13:56:31 2020 +0900
+
+    round dx dy
+
+[33mcommit b703cba5ee2d22ed587f478e2309d140f797dd05[m
+Merge: 8f35f4a 4ef820b
+Author: jhsul51 <jhsul516@gmail.com>
+Date:   Tue Nov 24 13:54:28 2020 +0900
+
+    merge master
+
+[33mcommit 8f35f4a2b10f7377e8c653ff900ec3332907becc[m
+Author: jhsul51 <jhsul516@gmail.com>
+Date:   Tue Nov 24 13:51:40 2020 +0900
+
+    bottomline value improved
+
+[33mcommit 4ef820b656dda3273bd6a752a60d7d218308b98f[m
+Author: taxis <taxis853@gmail.com>
+Date:   Tue Nov 24 13:50:02 2020 +0900
+
+    head.py modified: returns coordinate of the bottome vertex
+
+[33mcommit b305bfe4be77daf3228935998334f3e3c6177323[m
+Author: mhsong <sniaw21@gmail.com>
+Date:   Tue Nov 24 13:37:31 2020 +0900
+
+    Run model and script
+
+[33mcommit f2ff64b02a1f507a073c1bead9c604a65ed8a6dc[m
+Author: mhsong <sniaw21@gmail.com>
+Date:   Tue Nov 24 13:34:41 2020 +0900
+
+    Fix merge error
+
+[33mcommit 4eb4700d9c26a7c0090b2fe482325de5dbd3424e[m
+Author: mhsong <sniaw21@gmail.com>
+Date:   Tue Nov 24 12:38:09 2020 +0900
+
+    Apply lint, conquer draw_bottomline
+
+[33mcommit 8d201667b297227d6e1ab5846438e12abacb6ad2[m
+Author: jhsul51 <jhsul516@gmail.com>
+Date:   Tue Nov 24 12:27:28 2020 +0900
+
+    color sorted, bottomline interval implemented
+
+[33mcommit 344f1ed2da9ac8c60924a3dc2427bae987ba7266[m
+Author: jhsul51 <jhsul516@gmail.com>
+Date:   Tue Nov 24 12:23:30 2020 +0900
+
+    color order and bottonline_interval implemented
+
+[33mcommit 561aab694a29240fb565a195df48f71c26ca0abe[m
+Author: mhsong <sniaw21@gmail.com>
+Date:   Tue Nov 24 12:16:22 2020 +0900
+
+    Find missing first element
+
+[33mcommit 9d99f14b27ffaae1a7f48c438d0bd942775798e1[m
+Author: mhsong <sniaw21@gmail.com>
+Date:   Tue Nov 24 11:42:01 2020 +0900
+
+    axis list as Input
+
+[33mcommit e19ad03bec18799a3668fe65ce6f8a89f47e8845[m
+Author: elzino <ljh0728@snu.ac.kr>
+Date:   Tue Nov 24 11:35:47 2020 +0900
+
+    changed the path location
+
+[33mcommit 6ae09682703e5044913c5f7a86c20937e5b887c3[m
+Merge: 0c209fc 5489a6d
+Author: elzino <ljh0728@snu.ac.kr>
+Date:   Tue Nov 24 11:23:59 2020 +0900
+
+    Merge branch 'main' of https://github.com/sniaw21/cv_project into main
+
+[33mcommit 0c209fc81f1381cc05d4bd4491562f5834777044[m
+Author: elzino <ljh0728@snu.ac.kr>
+Date:   Tue Nov 24 11:23:42 2020 +0900
+
+    print debugging infos using parameter
+
+[33mcommit 5489a6d91cee021f94f4be80c8646350f0a1645c[m
+Author: mhsong <sniaw21@gmail.com>
+Date:   Tue Nov 24 11:20:15 2020 +0900
+
+    Use average delta rather than minimum
+
+[33mcommit b6ff16a0cdeb347b9f3bc3dc4537a21658d6704c[m
+Author: mhsong <sniaw21@gmail.com>
+Date:   Tue Nov 24 11:02:49 2020 +0900
+
+    Add dbox list to ocr
+
+[33mcommit c6a3336dadbc6a11b8875c29d3517a8bff7de409[m
+Author: mhsong <sniaw21@gmail.com>
+Date:   Tue Nov 24 01:31:46 2020 +0900
+
+    Handle last undetected case
+
+[33mcommit df3deacac93265e96dbd63e9c6e39481b0447ee1[m
+Author: mhsong <sniaw21@gmail.com>
+Date:   Tue Nov 24 00:54:52 2020 +0900
+
+    Fix bugs in ocr, change interface of head.py
+
+[33mcommit f30248880d1467c572f77948322bfa9f4bc114dc[m
+Author: elzino <ljh0728@snu.ac.kr>
+Date:   Tue Nov 24 00:22:05 2020 +0900
+
+    add groundtruth data as csv files
+
+[33mcommit e76008902ebe8da59529c74f0fbb4d9945ff0086[m
+Author: elzino <ljh0728@snu.ac.kr>
+Date:   Tue Nov 24 00:19:24 2020 +0900
+
+    add evaluate.py
+
+[33mcommit a449307bb203855d9efcf71501a9467820925f3d[m
+Author: elzino <ljh0728@snu.ac.kr>
+Date:   Mon Nov 23 23:44:03 2020 +0900
+
+    changed the criterion of determining edge of the axis
+
+[33mcommit d9a0e535d8958cbb8bd48ff7f0a44e8fc1c77258[m
+Author: elzino <ljh0728@snu.ac.kr>
+Date:   Mon Nov 23 23:27:15 2020 +0900
+
+    remove unused codes in axis.py
+
+[33mcommit 285ea1efc1c83c4192f5d5f9a1dabe3235ff2f32[m
+Author: jhsul51 <jhsul516@gmail.com>
+Date:   Mon Nov 23 15:01:14 2020 +0900
+
+    Matlab16~20 data added with real value
+
+[33mcommit 174f4550ab05fc35d2d801685f82363a69f519fe[m
+Author: jhsul51 <jhsul516@gmail.com>
+Date:   Mon Nov 23 15:00:25 2020 +0900
+
+    adjacent value heuristic change
+
+[33mcommit 41b6f82f7fce0f586a22f2cbde6833fece40259d[m
+Author: jhsul51 <jhsul516@gmail.com>
+Date:   Mon Nov 23 14:59:45 2020 +0900
+
+    draw_bottomline.py but not yet compatible
+
+[33mcommit a029afa05ebb0838fcbc99e11740bd0baea51262[m
+Merge: 565f9da 8ddfc42
+Author: jhsul51 <jhsul516@gmail.com>
+Date:   Sat Nov 21 00:47:30 2020 +0900
+
+    Merge branch 'main' of https://github.com/sniaw21/cv_project into main
+
+[33mcommit 8ddfc42758ff308c4da975a706c224951fcb4a49[m
+Author: mhsong <sniaw21@gmail.com>
+Date:   Thu Nov 19 20:12:23 2020 +0900
+
+    Apply autopep8
+
+[33mcommit a931550baa37f745919b6adcd73b405555db2f8d[m
+Author: taxis <taxis853@gmail.com>
+Date:   Tue Nov 17 22:28:06 2020 +0900
+
+    head modified: even find the hidden head!
+
+[33mcommit 565f9da5efd412dc60e7df73ca645d6270911f35[m
+Author: jhsul <jhsul516@gmail.com>
+Date:   Tue Nov 17 10:46:03 2020 +0900
+
+    change cv to cv2
+
+[33mcommit 2a761a9f70c947a7e33835a622b90e12187c3aad[m
+Author: taxis <taxis853@gmail.com>
+Date:   Tue Nov 17 10:44:52 2020 +0900
+
+    head modified
+
+[33mcommit 08be0234a2d5bc7099362d07bca575c9c3d09344[m
+Author: jhsul <jhsul516@gmail.com>
+Date:   Tue Nov 17 02:41:24 2020 +0900
+
+    Finds number of colors, Using H and S to find colors
+
+[33mcommit 077587c9012c7d965dad37d9b89ba8bef6ebd407[m
+Merge: bf97c48 a0a3c70
+Author: elzino <ljh0728@snu.ac.kr>
+Date:   Mon Nov 16 21:56:26 2020 +0900
+
+    Merge branch 'main' of https://github.com/sniaw21/cv_project into main
+
+[33mcommit bf97c48c98e3e842bc442240b338f539a8395b57[m
+Author: elzino <ljh0728@snu.ac.kr>
+Date:   Mon Nov 16 21:55:17 2020 +0900
+
+    changed the way to open image in axis.py
+
+[33mcommit a0a3c706e858ca55a2a11c2bcfdcd9920b3bfd4c[m
+Author: jhsul <jhsul516@gmail.com>
+Date:   Mon Nov 16 21:01:40 2020 +0900
+
+    Hcolor.py get image from argument
+
+[33mcommit a7d077bb52d632f07c9eecad10546f2f817b2e67[m
+Author: mhsong <sniaw21@gmail.com>
+Date:   Mon Nov 16 20:14:36 2020 +0900
+
+    Implement tick to value roughly
+
+[33mcommit 5fcaf86bde2adba91223a9f07d2cb2f3f5
