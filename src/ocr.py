@@ -100,7 +100,8 @@ def tick_to_value(chart_path, box_path, axis_list):
             curpos = curpos - (i+1) * delta_pos
             boxinfo = BoxInfo(pos=curpos, boxlen=avg_boxlen)
             value, _ = boxinfo.ocr(igs, isNumeric)
-            tickval_list.append(value)
+            if value is not None:
+                tickval_list.append(value)
 
         curpos = boxinfos[0].pos
 

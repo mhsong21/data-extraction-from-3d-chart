@@ -13,7 +13,7 @@ import math
 
 
 def save_predict_as_csv(x_label, y_label, data, save_path):
-    df = pd.DataFrame(data, header=x_label, index=y_label)
+    df = pd.DataFrame(data, columns=x_label, index=y_label)
     df.to_csv(save_path)
 
 
@@ -29,6 +29,9 @@ def main(filename):
                      "--file_name=" + chart_name])
     box_path = os.path.join(os.path.abspath(
         sys.path[0]), '../result/res_' + filename + '.txt')
+
+    predict_path = os.path.join(os.path.abspath(
+        sys.path[0]), '../result/pred_' + filename + '.csv')
 
     axis_points, degrees = axis.axis(folder_path, chart_name)
     axis_list = [x[0] + x[1] for x in axis_points]
@@ -81,13 +84,13 @@ def main(filename):
                     data_map[i, j+jd+k+1] = math.nan
                 jd += n - 1
 
-        left = y_len - len_points
+        left = y_len - (len_points + jd)
         if left > 0:
-            data_map[i, len_points:] = math.nan
+            data_map[i, len_points + jd:] = math.nan
 
     print(data_map)
+    save_predict_as_csv(result[1], reversed(result[2]), data_map.T, predict_path)
     draw_values(chart_path, data_map, coord_map)
-    return data_map
 
 
 def find_delta(points, line):
