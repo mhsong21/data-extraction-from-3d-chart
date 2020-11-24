@@ -218,6 +218,17 @@ def template_finding(img, res, bar_colors, axis_list):
     return template, vertex
 
 
+def edge_enhance(igs):
+    new_igs = np.copy(igs)
+
+    H, W, _ = igs.shape
+    for y in range(1, H-1):
+        for x in range(1, W-1):
+            if np.all(igs[y, x] == 0):
+                new_igs[y-1:y+2, x-1:x+2, :] = 0
+    return new_igs
+
+
 def run(filename, axis_list):
     if not os.path.isdir('./temp'):
         os.mkdir('./temp')
@@ -235,6 +246,8 @@ def run(filename, axis_list):
 
     template_coordinate = list()
     min_interval = 5000
+    for i, igs in enumerate(result):
+        result[i] = edge_enhance(igs)
 
     for i in range(number_colors):
         res = Image.fromarray(result[i])
