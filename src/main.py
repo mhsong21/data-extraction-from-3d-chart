@@ -58,7 +58,9 @@ def main(filename):
     print(template_coordinate)
 
     x_len = len(bottom_line)
-    y_len = len(template_coordinate[0][0])
+    y_len = -1
+    for temp_coord in template_coordinate:
+        y_len = max(y_len, len(temp_coord[0]))
 
     coord_map = np.empty((x_len, y_len, 2))
     data_map = np.empty((x_len, y_len))
