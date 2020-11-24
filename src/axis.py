@@ -6,6 +6,8 @@ import numpy as np
 from PIL import Image
 
 
+show_intermediate_result = False
+
 def show_wait_destroy(window_name, img):
     cv2.imshow(window_name, img)
     cv2.moveWindow(window_name, 500, 0)
@@ -75,17 +77,16 @@ def find_point(axis_img, first_direction, second_direction):
 
 def make_kernel(theta, length=25):
     if theta == 0:
-        print("theta : 0")
+        if show_intermediate_result:
+            print("theta : 0")
         return np.ones((1, 30))
     elif theta == -90:
-        print("theta : -90")
+        if show_intermediate_result:
+            print("theta : -90")
         return np.ones((30, 1))
 
     row = math.ceil(np.abs(length * np.sin(theta * np.pi / 180)))
     col = math.ceil(np.abs(length * np.cos(theta * np.pi / 180)))
-    print("theta : ", theta)
-    print("kernel width : ", col)
-    print("kernel height : ", row)
 
     start_index = 0
     if 0 < theta < 45:
@@ -120,7 +121,12 @@ def make_kernel(theta, length=25):
             index_ceiling = min(math.ceil(index), row)
             kernel[start_index:index_ceiling, col-i] = 1
             start_index = index_ceiling
-    print(kernel)
+
+    if show_intermediate_result:
+        print("theta : ", theta)
+        print("kernel width : ", col)
+        print("kernel height : ", row)
+        print(kernel)
     return kernel
 
 
@@ -135,7 +141,8 @@ def remove_color(img, num_colors):
     removed_gray = cv2.cvtColor(removed, cv2.COLOR_BGR2GRAY)
     removed_gray = removed_gray + ~back
 
-    show_wait_destroy("removed_gray", removed_gray)
+    if show_intermediate_result:
+        show_wait_destroy("removed_gray", removed_gray)
 
     return removed_gray
 
@@ -147,7 +154,6 @@ def find_frequent_degree(img, edges):
 
     lines = cv2.HoughLinesP(edges, 1, np.pi/360,
                             threshold, minLineLength, maxLineGap)
-    print("detected lines in 'find_frequent_degree' function : ", len(lines))
 
     degree_resolution = 180
     theta_votes = np.zeros(degree_resolution)
@@ -170,10 +176,12 @@ def find_frequent_degree(img, edges):
             suppression_result[i] = theta_votes[i]
     for i in range(5):
         suppression_result[180-1-i] = 0
-    print("suppression_result : ", suppression_result)
     sorted_indices = np.argsort(suppression_result)[::-1]
 
-    show_wait_destroy("img", img)
+    if show_intermediate_result:
+        print("detected lines in 'find_frequent_degree' function : ", len(lines))
+        print("suppression_result : ", suppression_result)
+        show_wait_destroy("img", img)
     return sorted_indices[0] - 90, sorted_indices[1] - 90, sorted_indices[2] - 90
 
 
@@ -187,8 +195,6 @@ def find_axis(gray, degree):
     result = cv2.dilate(result, kernel)
     result_npy = np.array(result)
 
-    show_wait_destroy("result", result)
-
     if degree == 0:
         point1 = find_point(result_npy, "bottommost", "leftmost")
         point2 = find_point(result_npy, "bottommost", "rightmost")
@@ -201,10 +207,14 @@ def find_axis(gray, degree):
     elif -90 < degree < 0:
         point1 = find_point(result_npy, "bottommost", "rightmost")
         point2 = find_point(result_npy, "rightmost", "bottommost")
+
+    if show_intermediate_result:
+        show_wait_destroy("result", result)
+
     return point1, point2
 
 
-def main(folder_path, img_filename, result_folder_path="../result/"):
+def axis(folder_path, img_filename, result_folder_path="../result/"):
     image_path = folder_path + img_filename
     # img = cv2.imread(image_path)
     # img = cv2.resize(img, dsize=(600, 600))
@@ -213,27 +223,32 @@ def main(folder_path, img_filename, result_folder_path="../result/"):
 
     gray = remove_color(img, 3)
     bw_not = cv2.bitwise_not(gray)
-    show_wait_destroy("bw_not", bw_not)
+    if show_intermediate_result:
+        show_wait_destroy("bw_not", bw_not)
     degrees = find_frequent_degree(img, bw_not)
 
+    degrees = list(degrees)
     axis_points = []
+    if degrees[1] > 0:
+        temp_degree = degrees[1]
+        degrees[1] = degrees[2]
+        degrees[2] = temp_degree
+
     for degree in degrees:
         axis_points.append(find_axis(gray, degree))
 
-    for i in range(len(axis_points)):
-        print("axis", i, ": ", axis_points[i])
+    cv2.line(img, axis_points[0][0], axis_points[0][1], (255, 0, 0), 1)
+    cv2.line(img, axis_points[1][0], axis_points[1][1], (255, 0, 0), 1)
+    cv2.line(img, axis_points[2][0], axis_points[2][1], (255, 0, 0), 1)
 
-    cv2.line(img, axis_points[0][0], axis_points[0][1], (0, 0, 255), 1)
-    cv2.line(img, axis_points[1][0], axis_points[1][1], (0, 0, 255), 1)
-    cv2.line(img, axis_points[2][0], axis_points[2][1], (0, 0, 255), 1)
-    show_wait_destroy("img", img)
-    BGR_to_RGB = np.zeros(img.shape)
-    BGR_to_RGB[:, :, 0] = img[:, :, 2]
-    BGR_to_RGB[:, :, 1] = img[:, :, 1]
-    BGR_to_RGB[:, :, 2] = img[:, :, 0]
-    img_pil = Image.fromarray(BGR_to_RGB.astype(np.uint8))
+    if show_intermediate_result:
+        for i in range(len(axis_points)):
+            print("axis", i, ": ", axis_points[i])
+        show_wait_destroy("img", img)
+
+    img_pil = Image.fromarray(img.astype(np.uint8))
     img_pil.save(result_folder_path + img_filename)
-    return axis_points
+    return axis_points, degrees
 
 
 def iterate_data(folder_path):
@@ -241,7 +256,7 @@ def iterate_data(folder_path):
     img_list = [
         img_file_name for img_file_name in img_list if img_file_name.endswith(".png")]
     for img_file_name in img_list:
-        main(folder_path, img_file_name)
+        axis(folder_path, img_file_name)
 
 
 if __name__ == "__main__":
