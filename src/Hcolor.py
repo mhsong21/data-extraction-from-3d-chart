@@ -10,7 +10,7 @@ def color_find(img):  # , num_colors):
     result = list()
     # Convert BGR to HSV
     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    hist = cv2.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])    
+    hist = cv2.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])
     whites = np.unravel_index(hist.argmax(), hist.shape)
     hist[whites] = 0
     maxi = ndimage.maximum_filter(hist, size=(1, 1))
@@ -51,15 +51,15 @@ def color_find(img):  # , num_colors):
     # H = np.sum(hist, axis= 1)
     # most_colors = np.argpartition(H, -(num_colors+1));
     # most_colors.astype(np.uint8)
-    ##visualize H histogram
-    #plt.plot(H)
-    #plt.show()
-    
-    ## Background image
-    #Assumtion: Background image consist with only white 
+    # visualize H histogram
+    # plt.plot(H)
+    # plt.show()
+
+    # Background image
+    # Assumtion: Background image consist with only white
     back = cv2.inRange(hsv, (0, 0, 0), (180, 0, 255))
     background = cv2.bitwise_and(img, img, mask=back)
-    # backshow = Image.fromarray(background)                    
+    # backshow = Image.fromarray(background)
     # backshow.show()
     # define range of most colors in HSV
     # for i in range(num_colors):
@@ -82,15 +82,16 @@ def color_find(img):  # , num_colors):
         maxx = 0
         for y in range(height):
             for x in range(width):
-                if mask[y,x] == 255 and maxy < y:
+                if mask[y, x] == 255 and maxy < y:
                     maxy = y
                     maxx = x
         res = cv2.bitwise_and(img, img, mask=mask)
-        color_order.append((maxy,maxx,res,colors[i]))
+        result.append(res)
 
-    color_sort = sorted(color_order, key = lambda x:x[0])
+    color_sort = sorted(color_order, key=lambda x: x[0])
     color_sort = color_sort[::-1]
-    bottomline_interval = ((color_sort[0][0] - color_sort[1][0])**2 + (color_sort[0][1] - color_sort[1][1])**2)**0.5
+    bottomline_interval = (
+        (color_sort[0][0] - color_sort[1][0])**2 + (color_sort[0][1] - color_sort[1][1])**2)**0.5
     result = [x[2] for x in color_sort]
     colors = [x[3] for x in color_sort]
     # result : color bars
@@ -106,7 +107,8 @@ def main():
     img_in = Image.open('data/' + filename + '.png').convert('RGB')
     # img_in.show()
     img = np.array(img_in)
-    result, background, number_colors, bar_colors, bottomline_interval = color_find(img)
+    result, background, number_colors, bar_colors, bottomline_interval = color_find(
+        img)
     # , number_colors)
     back = Image.fromarray(background)
     back.save("color_divided/" + filename + "background.png")
