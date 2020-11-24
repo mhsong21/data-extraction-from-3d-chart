@@ -72,6 +72,15 @@ class LineInfo:
 
         return dist
 
+    def height(self, point):
+        x, y = point
+        a, b = self.equation
+        if self.type == LineType.NORMAL:
+            yp = a*x + b
+            return abs(y - yp)
+
+        return 0
+
 
 def thresholding(image):
     return cv2.threshold(image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
