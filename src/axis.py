@@ -214,7 +214,7 @@ def find_axis(gray, degree):
     return point1, point2
 
 
-def axis(folder_path, img_filename, result_folder_path="../result/"):
+def axis(folder_path, img_filename, result_folder_path="./result/"):
     image_path = folder_path + img_filename
     # img = cv2.imread(image_path)
     # img = cv2.resize(img, dsize=(600, 600))
@@ -253,15 +253,14 @@ def axis(folder_path, img_filename, result_folder_path="../result/"):
 
 def iterate_data(folder_path):
     img_list = os.listdir(folder_path)
-    img_list = [
-        img_file_name for img_file_name in img_list if img_file_name.endswith(".png")]
+    img_list = [img_file_name for img_file_name in img_list if img_file_name.endswith(".png")]
     for img_file_name in img_list:
         axis(folder_path, img_file_name)
 
 
 if __name__ == "__main__":
     # main('../data/matlab_three.png')
-    iterate_data("../data/matlab/")
+    iterate_data("./data/matlab/")
     # main('../data/', 'Matlab10.png')
     # main('../data/Matlab1.png')
     # print(make_kernel(5, 17, False))
