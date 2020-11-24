@@ -5,7 +5,7 @@ import matplotlib
 import sys
 import scipy.ndimage as ndimage
 import Hcolor
-
+import os
 
 def template_matching(img, res, template, min_interval, vertex):
     ####
@@ -17,12 +17,11 @@ def template_matching(img, res, template, min_interval, vertex):
     dst = cv2.imread("./Matlab8/color_0.png")
     '''
     src = res
-    cv2.imwrite("matched.png", img)
-    dst = cv2.imread("matched.png")
+    dst = img.copy()
     result = cv2.matchTemplate(src, template, cv2.TM_CCOEFF_NORMED)
 
     # using threshold
-    threshold = 0.8
+    threshold = 0.7
     loc = np.where(result >= threshold)
     # elements of coord[0] are x-coordinates, coord[1] are y-coordinates
     coord = np.zeros((2, len(loc[0])))
@@ -49,7 +48,8 @@ def template_matching(img, res, template, min_interval, vertex):
         for i in range(coordinate.shape[0]-1):
             if (coordinate[0][i+1] - coordinate[0][i]) < min_interval:
                 min_interval = coordinate[0][i+1] - coordinate[0][i]
-
+    if min_interval == 0:
+        min_interval = 1
     x_coord = coordinate[0][0]
     if min_interval < 5000:
         while x_coord < result.shape[1]:
@@ -68,7 +68,7 @@ def template_matching(img, res, template, min_interval, vertex):
     coord = coordinate
     for i in range(coord.shape[1]):
         for j in range(coord.shape[1]):
-            if coord[0][j] - 10 <= coord[0][i] <= coord[0][j] + 10:
+            if coord[0][j] - template.shape[1] <= coord[0][i] <= coord[0][j] + template.shape[1]:
                 if result[coord[1][j]][coord[0][j]] > result[coord[1][i]][coord[0][i]]:
                     coordinate[:, i] = coord[:, j]
     coordinate = np.unique(coordinate, axis=1)
@@ -121,8 +121,8 @@ def template_finding(img, res, bar_colors, axis_list):
             break
 
     # the coordinate of head top point is saved in x, y
-    x -= 1
-    y -= 1
+    # x -= 1
+    # y -= 1
 
     # for calculating the slope of x-axis and y-axis of chart,
     # I put manually the stating and end points of axes
@@ -140,7 +140,55 @@ def template_finding(img, res, bar_colors, axis_list):
     if y_slope < 0:
         y_slope = x_slope
         x_slope = y_slope
-    
+    '''
+    x_temp = x
+    y_temp = y
+    while colorArea[y_temp][x_temp] != 0:
+        for i in range(0, colorArea.shape[1]):
+            x_temp += 1
+            if colorArea[y_temp][x_temp] == 0:
+                x_temp -= 1
+                break
+        y_temp += 1
+    x_alongy = x_temp
+    y_alongy = y_temp
+    '''
+    x_temp = x
+    y_temp = y
+    x_max = x - 1
+
+    for i in range(0,colorArea.shape[0]):
+        x_temp = x
+        y_temp = y + i
+        while colorArea[y_temp][x_temp] != 0:
+            x_temp += 1
+        if x_temp - 1 >= x_max:
+            x_max = x_temp - 1
+        else:
+            break 
+
+    x_alongy = x_max
+    y_alongy = y_temp
+
+
+    x_temp = x
+    y_temp = y
+    x_min = x + 1
+
+    for i in range(0,colorArea.shape[0]):
+        x_temp = x
+        y_temp = y + i
+        while colorArea[y_temp][x_temp] != 0:
+            x_temp -= 1
+        if x_temp + 1 <= x_min:
+            x_min = x_temp + 1
+        else:
+            break 
+
+    x_alongx = x_min
+    y_alongx = y_temp
+
+    '''
     # along parrel line to x-axis, find the point where grayscale value of adjacent 5 pixels up and down.
     for i in range(0, colorArea.shape[1]):
         if np.amax(colorArea[y - int(i*x_slope): y - int(i*x_slope) + 6, x - i]) == 0:#np.amax(colorArea[y - int(i*x_slope): y - int(i*x_slope) + 6, x - i]) == 0:
@@ -154,7 +202,7 @@ def template_finding(img, res, bar_colors, axis_list):
             x_alongy = x + i
             y_alongy = y + int(i*y_slope)
             break
-
+    '''
     template_coord = np.array([[x, y], [x_alongy, y_alongy], [x_alongx, y_alongx], [
                               x_alongx + x_alongy - x, y_alongx + y_alongy - y]])
     template = res[np.amin(template_coord[:, 1]): np.amax(
@@ -170,43 +218,64 @@ def template_finding(img, res, bar_colors, axis_list):
     return template, vertex
 
 
+def edge_enhance(igs):
+    new_igs = np.copy(igs)
+
+    H, W, _ = igs.shape
+    for y in range(1, H-1):
+        for x in range(1, W-1):
+            if np.all(igs[y, x] == 0):
+                new_igs[y-1:y+2, x-1:x+2, :] = 0
+    return new_igs
+
+
 def run(filename, axis_list):
+    if not os.path.isdir('./temp'):
+        os.mkdir('./temp')
+    folder = './temp/' + filename
+    if not os.path.isdir(folder):
+        os.mkdir(folder)
     # img_in = Image.open('data/' + filename +'.png').convert('RGB')
     # img_in.show()
     # img = np.array(img_in)
     img = cv2.imread('data/' + filename + '.png', cv2.IMREAD_COLOR)
-    result, background, number_colors, bar_colors, _ = Hcolor.color_find(img) # , number_colors)
+    result, background, number_colors, bar_colors, _ = Hcolor.color_find(
+        img)  # , number_colors)
     back = Image.fromarray(background)
     back.save("color_divided/" + filename + "background.png")
 
     template_coordinate = list()
     min_interval = 5000
+    for i, igs in enumerate(result):
+        result[i] = edge_enhance(igs)
 
     for i in range(number_colors):
         res = Image.fromarray(result[i])
         image_name = "color_divided/"+filename+"color_%i.png" % i
         res.save(image_name)
 
-        template, vertex = template_finding(img, result[i], bar_colors[i], axis_list)
-        image_name = filename+"/template_%i.png" % i
+        template, vertex = template_finding(
+            img, result[i], bar_colors[i], axis_list)
+        image_name = folder+"/template_%i.png" % i
         cv2.imwrite(image_name, template)
 
         _, _, min_interval = template_matching(
             img, result[i], template, min_interval, vertex)
 
     for i in range(number_colors):
-        template = cv2.imread(filename+"/template_%i.png" % i)
+        template = cv2.imread(folder+"/template_%i.png" % i)
         matched_image, coord, min_interval = template_matching(
             img, result[i], template, min_interval, vertex)
         template_coordinate.append(coord)
-        image_name = filename+"/matched_image_%i.png" % i
+        image_name = folder+"/matched_image_%i.png" % i
         cv2.imwrite(image_name, matched_image)
     # template_coordinate is the bottom vertex coordinate of the detected head
     print(template_coordinate)
+    return template_coordinate
 
 
 if __name__ == '__main__':
     filename = sys.argv[1]
-    #axis_list = np.array([[[0,0],[0,0]],[[573,561] , [652,366]],[[573,561] , [55, 488]]])
-    #run(filename, axis_list)
-    run(filename)
+    axis_list = np.array([[[0,0],[0,0]],[[573,561] , [652,366]],[[573,561] , [55, 488]]])
+    run(filename, axis_list)
+    #run(filename)
