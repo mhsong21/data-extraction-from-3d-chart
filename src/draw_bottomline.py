@@ -15,10 +15,10 @@ from PIL import Image
 
 
 def draw_bottomline(axis_points, degrees, num_colors, delta_box):
-    dx = (int)(delta_box[1] * math.cos(-degrees[1]/180*math.pi))
-    dy = (int)(delta_box[1] * math.sin(-degrees[1]/180*math.pi))
+    dx = (int)(delta_box * math.cos(-degrees[1]/180*math.pi))
+    dy = (int)(delta_box * math.sin(-degrees[1]/180*math.pi))
     jump = (dx, -dy)
-    print("delta_box, degree, jump: ", delta_box[1], degrees[1], jump)
+    print("delta_box, degree, jump: ", delta_box, degrees[1], jump)
     start = axis_points[2][0]
     end = axis_points[2][1]
     bottom_line = [(start, end)]
@@ -33,9 +33,9 @@ def draw_bottomline(axis_points, degrees, num_colors, delta_box):
 def main(filename, axis_points, degrees, dbox):
     img_in = Image.open('./data/' + filename + '.png').convert('RGB')
     img = np.array(img_in)
-    result, background, num_colors, bar_colors = Hcolor.color_find(img)
+    result, background, num_colors, bar_colors, bottomline_interval = Hcolor.color_find(img)
 
-    bottom_line = draw_bottomline(axis_points, degrees, num_colors, dbox)
+    bottom_line = draw_bottomline(axis_points, degrees, num_colors, bottomline_interval)
 
     for lines in bottom_line:
         print(lines)
