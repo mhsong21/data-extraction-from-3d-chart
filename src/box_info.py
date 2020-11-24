@@ -77,9 +77,9 @@ class LineInfo:
         a, b = self.equation
         if self.type == LineType.NORMAL:
             yp = a*x + b
-            return abs(y - yp)
+            return abs(y - yp), yp
 
-        return 0
+        return 0, 0
 
 
 def thresholding(image):

@@ -9,6 +9,7 @@ import pandas as pd
 import numpy as np
 from PIL import Image, ImageDraw
 import matplotlib.pyplot as plt
+import math
 
 
 def save_predict_as_csv(x_label, y_label, data, save_path):
@@ -46,35 +47,70 @@ def main(filename):
     bottom_line = draw_bottomline.main(filename, axis_points, degrees, dbox)
     template_coordinate = head.run(filename, axis_points)
 
-    print("=============================")
-    print("=============================")
-    print("=============================")
-    print("=============================")
-    print("=============================")
-    print("=============================")
-    print(result)
-
-    print(tick_px, tick_val)
-    print(template_coordinate)
-
     x_len = len(bottom_line)
     y_len = -1
     for temp_coord in template_coordinate:
         y_len = max(y_len, len(temp_coord[0]))
 
-    coord_map = np.empty((x_len, y_len, 2))
-    data_map = np.empty((x_len, y_len))
+    coord_map = np.zeros((x_len, y_len, 2))
+    data_map = np.zeros((x_len, y_len))
     for i, line in enumerate(bottom_line):
         x_list = template_coordinate[i][0]
         y_list = template_coordinate[i][1]
-        for j, point in enumerate(zip(x_list, y_list)):
-            h_px = line.height(point)
+        points = list(zip(x_list, y_list))
+
+        min_delta, delta_vector = find_delta(points, line)
+        len_points = len(points)
+        jd = 0
+        for j, point in enumerate(points):
+            h_px, yp0 = line.height(point)
             h_val = h_px * tick_val / tick_px
-            coord_map[i, j] = point
-            data_map[i, j] = h_val
+            coord_map[i, j+jd] = point
+            data_map[i, j+jd] = h_val
+
+            if j < len_points - 1:
+                x0, y0 = point
+                x1, y1 = points[j+1]
+                _, yp1 = line.height(points[j+1])
+
+                dist = np.sqrt((x1-x0)**2+(yp1-yp0)**2)
+                n = int(round(dist / min_delta))
+
+                for k in range(n-1):
+                    coord_map[i, j+jd+k+1, :] = None
+                    data_map[i, j+jd+k+1] = math.nan
+                jd += n - 1
+
+        left = y_len - len_points
+        if left > 0:
+            data_map[i, len_points:] = math.nan
 
     print(data_map)
     draw_values(chart_path, data_map, coord_map)
+    return data_map
+
+
+def find_delta(points, line):
+    # boxes should be sorted by ascending order
+
+    min_delta = 1000  # TODO: change to static max variable
+    min_dx = 0
+    min_dy = 0
+    for i in range(len(points)-1):
+        x0, y0 = points[i]
+        x1, y1 = points[i+1]
+        _, yp0 = line.height(points[i])
+        _, yp1 = line.height(points[i+1])
+        dx = x1 - x0
+        dy = yp1 - yp0
+        delta = np.sqrt(dx**2 + dy**2)
+        if delta < min_delta:
+            min_delta = delta
+            min_dx = dx
+            min_dy = dy
+
+    delta_pos = np.array([min_dx, min_dy])
+    return min_delta, delta_pos
 
 
 def draw_values(chart_path, data_map, coord_map):
@@ -86,7 +122,8 @@ def draw_values(chart_path, data_map, coord_map):
         for j in range(jh):
             x, y = coord_map[i, j]
             h_val = data_map[i, j]
-            draw.text((x-15, y-20), str(int(h_val)))
+            if not math.isnan(h_val):
+                draw.text((x-15, y-20), str(int(h_val)))
     plt.imshow(img, cmap='gray')
     plt.show()
 
