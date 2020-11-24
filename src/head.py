@@ -86,7 +86,7 @@ def template_matching(img, res, template, min_interval):
     return dst, coordinate, min_interval
 
 
-def template_finding(img, res, bar_colors):
+def template_finding(img, res, bar_colors, axis_list):
     ####
     # codes for finding a template (head)
     ####
@@ -125,16 +125,16 @@ def template_finding(img, res, bar_colors):
     # I put manually the stating and end points of axes
     # x-axis: x_start / x_end is the starting / ending points of x-axis respectively.
     # y-axis: y_start / y_end is the starting / ending points of y-axis respectively.
-    x_start = np.array([572, 562])
-    x_end = np.array([653, 366])
-    y_start = np.array([572, 562])
-    y_end = np.array([55, 488])
+
+    x_start = axis_list[1][0]
+    x_end = axis_list[1][1]
+    y_start = axis_list[2][0]
+    y_end = axis_list[2][1]
 
     x_slope = (x_end[1] - x_start[1]) / (x_end[0] - x_start[0])
     y_slope = (y_end[1] - y_start[1]) / (y_end[0] - y_start[0])
 
     if y_slope < 0:
-        temp = y_slope
         y_slope = x_slope
         x_slope = y_slope
 
@@ -163,7 +163,7 @@ def template_finding(img, res, bar_colors):
     return template
 
 
-def run(filename):
+def run(filename, axis_list):
     # img_in = Image.open('data/' + filename +'.png').convert('RGB')
     # img_in.show()
     # img = np.array(img_in)
@@ -180,7 +180,7 @@ def run(filename):
         image_name = "color_divided/"+filename+"color_%i.png" % i
         res.save(image_name)
 
-        template = template_finding(img, result[i], bar_colors[i])
+        template = template_finding(img, result[i], bar_colors[i], axis_list)
         image_name = filename+"/template_%i.png" % i
         cv2.imwrite(image_name, template)
 
