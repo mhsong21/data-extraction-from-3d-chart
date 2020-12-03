@@ -1,7 +1,7 @@
 import csv
 import numpy as np
 import pandas as pd
-
+import sys
 
 def evaluate(predict_csv_path, ground_truth_csv_path):
     print("----------Ground truth data----------")
@@ -23,4 +23,5 @@ def evaluate(predict_csv_path, ground_truth_csv_path):
 
 
 if __name__ == "__main__":
-    evaluate("../result/pred_Matlab16.csv", "../data/ground_truth/Matlab16.csv")
+    filename = sys.argv[1]  # ex) Matlab8
+    evaluate("./result/pred_" + filename + ".csv", "./data/ground_truth/" + filename + ".csv")

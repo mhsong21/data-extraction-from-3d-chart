@@ -47,6 +47,7 @@ def main(filename):
         if z1 is not None and z0 is not None:
             tick_val = float(z1 - z0)
             break
+
     bottom_line = draw_bottomline.main(filename, axis_points, degrees, dbox)
     template_coordinate = head.run(filename)
 
@@ -54,6 +55,12 @@ def main(filename):
     y_len = -1
     for temp_coord in template_coordinate:
         y_len = max(y_len, len(temp_coord[0]))
+
+    if x_len > len(result[1]):
+        result[1].extend([-99] * (x_len - len(result[1])))
+
+    if y_len > len(result[2]):
+        result[2].extend([-99] * (y_len - len(result[2])))
 
     coord_map = np.zeros((x_len, y_len, 2))
     data_map = np.zeros((x_len, y_len))

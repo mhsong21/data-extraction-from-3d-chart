@@ -43,15 +43,17 @@ def distance(p1, p2):
     return np.sqrt((x2-x1)**2 + (y2-y1)**2)
 
 
-def draw_boxes(img, boxinfos, line):
-    print(line)
+def draw_boxes(img, boxinfosList, lineList):
     newimg = Image.fromarray(np.array(img))
     draw = ImageDraw.Draw(newimg)
-    draw.line((line.start + line.end), fill=128, width=5)
-    for box in boxinfos:
-        x0, y0, x1, y1 = box.box.astype(int)
-        draw.rectangle([x0, y0, x1, y1], outline='black')
-        draw.text((x0+15, y0-20), str(int(line.line_dist(box))))
+    for line, boxinfos in zip(lineList, boxinfosList):
+        print(line)
+        draw.line((line.start + line.end), fill=128, width=5)
+        for box in boxinfos:
+            x0, y0, x1, y1 = box.box.astype(int)
+            draw.rectangle([x0, y0, x1, y1], outline='black')
+            # draw.text((x0+15, y0-20), str(int(line.line_dist(box))))
+
     plt.imshow(newimg, cmap='gray')
     plt.show()
 
@@ -65,16 +67,21 @@ def tick_to_value(chart_path, box_path, axis_list):
 
     dbox_list = []
     tickval_per_lines = []
-    lineinfos = map(LineInfo, axis_list)
+    lineinfos = list(map(LineInfo, axis_list))
+
+    ##
+    visualizelistList = []
+    ##
     for line in lineinfos:
         boxinfos = [box for box in box_candidates
                     if line.line_dist(box) <= tick_thres]
         boxinfos = sorted(boxinfos,
                           key=lambda box: distance(line.start, box.pos))
-        # draw_boxes(img, boxinfos, line)
 
         if len(boxinfos) <= 1:
+            tickval_per_lines.append([])
             continue
+        visualizelist = []
 
         boxlen_list = [box.length() for box in boxinfos]
         avg_boxlen = np.max(boxlen_list, axis=0) * 1.4
@@ -106,6 +113,7 @@ def tick_to_value(chart_path, box_path, axis_list):
         curpos = boxinfos[0].pos
 
         for cur_box in boxinfos:
+            visualizelist.append(cur_box)
             value, isNumeric = cur_box.ocr(igs, isNumeric)
             tickval_list.append(value)
 
@@ -118,6 +126,7 @@ def tick_to_value(chart_path, box_path, axis_list):
                 boxinfo = BoxInfo(pos=curpos, boxlen=avg_boxlen)
                 value, _ = boxinfo.ocr(igs, isNumeric)
                 if value is not None:
+                    visualizelist.append(boxinfo)
                     tickval_list.append(value)
             d_box_avg = d_box_avg + dist
 
@@ -129,10 +138,14 @@ def tick_to_value(chart_path, box_path, axis_list):
             value, _ = boxinfo.ocr(igs, isNumeric)
             if value is None:
                 break
+            visualizelist.append(boxinfo)
             tickval_list.append(value)
 
         d_box_avg = d_box_avg / (len(boxinfos) - 1)
         dbox_list.append(d_box_avg)
         tickval_per_lines.append(tickval_list)
+        visualizelistList.append(visualizelist)
+    draw_boxes(img, visualizelistList, lineinfos)
+    print(tickval_per_lines)
 
     return tickval_per_lines, dbox_list
