@@ -131,11 +131,11 @@ def template_matching(img, res, template, min_interval, vertex):
     
     for i in range(coordinate.shape[1]):
         coordinate[:,i] += vertex
-    
+    '''
     cv2.imshow("dst", dst)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-    
+    '''
     return dst, coordinate, min_interval
 
 
@@ -289,6 +289,12 @@ def run(filename):
         template_coordinate.append(coord)
         image_name = folder+"/matched_image_%i.png" % i
         cv2.imwrite(image_name, matched_image)
+        
+        cv2.imshow("matched image", matched_image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+
     # template_coordinate is the bottom vertex coordinate of the detected head
     print(template_coordinate)
     return template_coordinate
