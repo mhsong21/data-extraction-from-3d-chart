@@ -13,9 +13,11 @@ def color_find(img):  # , num_colors):
     hist = cv2.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])
     whites = np.unravel_index(hist.argmax(), hist.shape)
     hist[whites] = 0
-    maxi = ndimage.maximum_filter(hist, size=(1, 1))
-    M = np.max(maxi)
-    val = np.unique(maxi)
+    # plt.imshow(hist, interpolation='nearest')
+    # plt.show()
+    #maxi = ndimage.maximum_filter(hist, size=(1, 1))
+    M = np.max(hist)
+    val = np.unique(hist)
     cnt = 0
     color_val = list()
     colors_temp = list()
@@ -48,11 +50,11 @@ def color_find(img):  # , num_colors):
     print("number: ", num_colors)
     print(colors)
 
-    # H = np.sum(hist, axis= 1)
+    H = np.sum(hist, axis= 0)
     # most_colors = np.argpartition(H, -(num_colors+1));
     # most_colors.astype(np.uint8)
     # visualize H histogram
-    # plt.plot(H)
+    # plt.plot(H,color= (0,0.5,0.5))
     # plt.show()
 
     # Background image
@@ -90,16 +92,20 @@ def color_find(img):  # , num_colors):
         #res = cv2.medianBlur(res, 3)
         color_order.append((maxy,maxx,res,colors[i]))
     color_sort = sorted(color_order, key = lambda x:x[0], reverse = True)
-    bottomline_interval = 0
-    bottomline_interval = bottomline_interval +  ((color_sort[0][0] - color_sort[num_colors-1][0])**2 + (color_sort[0][1] - color_sort[num_colors-1][1])**2)**0.5
-    bottomline_interval = bottomline_interval/(num_colors-1)
+    bottomline_interval = []
+    for i in range(num_colors-1):
+        bottomline_interval.append(((color_sort[i][0] - color_sort[i+1][0])**2 + (color_sort[i][1] - color_sort[i+1][1])**2)**0.5)
+        #bottomline_interval = bottomline_interval +  ((color_sort[0][0] - color_sort[num_colors-1][0])**2 + (color_sort[0][1] - color_sort[num_colors-1][1])**2)**0.5
+    #bottomline_interval = bottomline_interval/(num_colors-1)
     result = [x[2] for x in color_sort]
     colors = [x[3] for x in color_sort]
     # result : color bars
     # background : background with no bars
     # num_colors : number of color bars
     # colors : Bars color value in list of tuple (H,S)
-    print(bottomline_interval)
+    bshow = Image.fromarray(result[0]+result[4])
+    bshow.show()
+    #print(bottomline_interval)
     return result, background, num_colors, colors, bottomline_interval
 
 
