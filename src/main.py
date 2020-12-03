@@ -57,10 +57,10 @@ def main(filename):
         y_len = max(y_len, len(temp_coord[0]))
 
     if x_len > len(result[1]):
-        result[1].extend([-99] * (x_len - len(result[1])))
+        result[1].extend(["miss"] * (x_len - len(result[1])))
 
     if y_len > len(result[2]):
-        result[2].extend([-99] * (y_len - len(result[2])))
+        result[2].extend(["miss"] * (y_len - len(result[2])))
 
     coord_map = np.zeros((x_len, y_len, 2))
     data_map = np.zeros((x_len, y_len))
@@ -142,7 +142,7 @@ def draw_values(chart_path, data_map, coord_map):
             x, y = coord_map[i, j]
             h_val = data_map[i, j]
             if not math.isnan(h_val):
-                draw.text((x-15, y-20), str(int(h_val)), fill=(0, 0, 0))
+                draw.text((x-15, y-20), str(round(h_val)), fill=(0, 0, 0))
     plt.imshow(img)
     plt.show()
 

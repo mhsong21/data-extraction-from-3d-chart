@@ -33,8 +33,7 @@ def draw_bottomline(axis_points, degrees, num_colors, delta_box):
 
 
 def main(filename, axis_points, degrees, dbox):
-    img_in = Image.open('./data/' + filename + '.png').convert('RGB')
-    img = np.array(img_in)
+    img = cv2.imread('./data/' + filename + '.png', cv2.IMREAD_COLOR)
     result, background, num_colors, bar_colors, bottomline_interval = Hcolor.color_find(img)
 
     bottom_line = draw_bottomline(axis_points, degrees, num_colors, bottomline_interval)
@@ -42,7 +41,8 @@ def main(filename, axis_points, degrees, dbox):
     for lines in bottom_line:
         print(lines)
         img = cv2.line(img, lines[0], lines[1], (0, 0, 255), 1)
-    # axis.show_wait_destroy("img_with_bottomlines", img)
+    
+    axis.show_wait_destroy("img_with_bottomlines", img)
 
     lineinfos = [LineInfo(x[0] + x[1]) for x in bottom_line]
     return lineinfos

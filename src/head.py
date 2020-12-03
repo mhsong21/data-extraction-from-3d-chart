@@ -6,6 +6,7 @@ import sys
 import scipy.ndimage as ndimage
 import Hcolor
 import os
+import matplotlib.pyplot as plt
 
 def template_matching(img, res, template, min_interval, vertex):
     ####
@@ -256,8 +257,18 @@ def run(filename):
     img = cv2.imread('data/' + filename + '.png', cv2.IMREAD_COLOR)
     result, background, number_colors, bar_colors, _ = Hcolor.color_find(
         img)  # , number_colors)
+    
+    cols = 3
+    rows = number_colors // 3 + 1
+    fig, axes = plt.subplots(ncols=cols, nrows=rows)
+    for i in range(number_colors):
+        axes[i // 3][i % 3].imshow(result[i])
+    plt.show()
+
     back = Image.fromarray(background)
     back.save("color_divided/" + filename + "background.png")
+
+
 
     template_coordinate = list()
     min_interval = 5000

@@ -80,6 +80,7 @@ def tick_to_value(chart_path, box_path, axis_list):
 
         if len(boxinfos) <= 1:
             tickval_per_lines.append([])
+            visualizelistList.append([])
             continue
         visualizelist = []
 
