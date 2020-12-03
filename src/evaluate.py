@@ -5,12 +5,12 @@ import sys
 
 def evaluate(predict_csv_path, ground_truth_csv_path):
     print("----------Ground truth data----------")
-    gt_df = pd.read_csv(ground_truth_csv_path)
+    gt_df = pd.read_csv(ground_truth_csv_path, index_col=0)
     print(gt_df)
     print("-------------------------------------\n")
 
     print("-----------Predicted data------------")
-    predict_df = pd.read_csv(predict_csv_path)
+    predict_df = pd.read_csv(predict_csv_path, index_col=0)
     print(predict_df)
     print("-------------------------------------\n")
 
