@@ -133,7 +133,7 @@ def find_delta(points, line):
 
 
 def draw_values(chart_path, data_map, coord_map):
-    img = Image.open(chart_path).convert('L')
+    img = Image.open(chart_path).convert('RGB')
     draw = ImageDraw.Draw(img)
 
     ih, jh = data_map.shape
@@ -142,8 +142,8 @@ def draw_values(chart_path, data_map, coord_map):
             x, y = coord_map[i, j]
             h_val = data_map[i, j]
             if not math.isnan(h_val):
-                draw.text((x-15, y-20), str(int(h_val)))
-    plt.imshow(img, cmap='gray')
+                draw.text((x-15, y-20), str(int(h_val)), fill=(0, 0, 0))
+    plt.imshow(img)
     plt.show()
 
 
