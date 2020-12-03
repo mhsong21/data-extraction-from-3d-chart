@@ -77,13 +77,17 @@ def find_point(axis_img, first_direction, second_direction):
 
 def make_kernel(theta, length=25):
     if theta == 0:
+        kernel = np.ones((1, 30))
         if show_intermediate_result:
-            print("theta : 0")
-        return np.ones((1, 30))
+            print("theta : ", theta)
+            print(kernel)
+        return kernel
     elif theta == -90:
+        kernel = np.ones((30, 1))
         if show_intermediate_result:
-            print("theta : -90")
-        return np.ones((30, 1))
+            print("theta : ", theta)
+            print(kernel)
+        return kernel
 
     row = math.ceil(np.abs(length * np.sin(theta * np.pi / 180)))
     col = math.ceil(np.abs(length * np.cos(theta * np.pi / 180)))
@@ -218,8 +222,9 @@ def axis(folder_path, img_filename, result_folder_path="./result/"):
     image_path = folder_path + img_filename
     # img = cv2.imread(image_path)
     # img = cv2.resize(img, dsize=(600, 600))
-    img_in = Image.open(image_path).convert('RGB')
-    img = np.array(img_in)
+    img = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    if show_intermediate_result:
+        show_wait_destroy("img", img)
 
     gray = remove_color(img, 3)
     bw_not = cv2.bitwise_not(gray)
@@ -237,9 +242,9 @@ def axis(folder_path, img_filename, result_folder_path="./result/"):
     for degree in degrees:
         axis_points.append(find_axis(gray, degree))
 
-    cv2.line(img, axis_points[0][0], axis_points[0][1], (255, 0, 0), 1)
-    cv2.line(img, axis_points[1][0], axis_points[1][1], (255, 0, 0), 1)
-    cv2.line(img, axis_points[2][0], axis_points[2][1], (255, 0, 0), 1)
+    cv2.line(img, axis_points[0][0], axis_points[0][1], (0, 0, 255), 2)
+    cv2.line(img, axis_points[1][0], axis_points[1][1], (0, 0, 255), 2)
+    cv2.line(img, axis_points[2][0], axis_points[2][1], (0, 0, 255), 2)
 
     if show_intermediate_result:
         for i in range(len(axis_points)):
@@ -260,7 +265,7 @@ def iterate_data(folder_path):
 
 if __name__ == "__main__":
     # main('../data/matlab_three.png')
-    iterate_data("./data/matlab/")
+    # iterate_data("./data/matlab/")
     # main('../data/', 'Matlab10.png')
-    # main('../data/Matlab1.png')
+    axis('../data/', 'Matlab8.png', "../result/")
     # print(make_kernel(5, 17, False))
