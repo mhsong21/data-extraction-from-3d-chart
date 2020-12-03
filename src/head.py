@@ -11,11 +11,7 @@ def template_matching(img, res, template, min_interval, vertex):
     ####
     # codes for matching the template
     ####
-    '''
-    src = cv2.imread("./Matlab8/color_0.png", cv2.IMREAD_COLOR)
-    template = cv2.imread("./Matlab8/template_0.png", cv2.IMREAD_COLOR)
-    dst = cv2.imread("./Matlab8/color_0.png")
-    '''
+
     src = res
     dst = img.copy()
     result = cv2.matchTemplate(src, template, cv2.TM_CCOEFF_NORMED)
@@ -49,11 +45,7 @@ def template_matching(img, res, template, min_interval, vertex):
                 if result[coord[1][j]][coord[0][j]] > result[coord[1][i]][coord[0][i]]:
                     coordinate[:, i] = coord[:, j]
     coordinate = np.unique(coordinate, axis=1)
-    '''
-    if coordinate.shape[1] == 1:
-        coordinate[:,0] += vertex
-        return dst, coordinate, min_interval
-    '''
+
     if coordinate.shape[1] == 0:
         coordinate = np.zeros((0,0))
         return dst, coordinate, min_interval
@@ -70,25 +62,6 @@ def template_matching(img, res, template, min_interval, vertex):
     if min_interval == 0:
         min_interval = 5
     x_coord = coordinate[0][0]
-    '''
-    threshold = 0.25
-    if min_interval < 5000:
-        while x_coord < result.shape[1]:
-            if np.amax(result[:, x_coord]) > threshold:
-                y_coord = np.argmax(result[:, x_coord])
-                coordinate = np.append(
-                    coordinate, [[x_coord], [y_coord]], axis=1)
-            x_coord += min_interval
-            
-        x_coord = coordinate[0][0]
-        while x_coord > 0:
-            if np.amax(result[:, x_coord]) > threshold:
-                y_coord = np.argmax(result[:, x_coord])
-                coordinate = np.append(
-                    coordinate, [[x_coord], [y_coord]], axis=1)
-            x_coord -= min_interval
-    coord = coordinate
-    '''
 
     threshold = 0.25
     if min_interval < 5000:
@@ -131,11 +104,7 @@ def template_matching(img, res, template, min_interval, vertex):
     
     for i in range(coordinate.shape[1]):
         coordinate[:,i] += vertex
-    '''
-    cv2.imshow("dst", dst)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    '''
+
     return dst, coordinate, min_interval
 
 
@@ -148,21 +117,13 @@ def template_finding(img, res, bar_colors, maxsize_template):
     # assume the deteceted color gray scale value
     colorValue_H = bar_colors[0]
     colorValue_S = bar_colors[1]
-    '''
-    cv2.imshow("hsv", hsv)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    '''
+
     colorArea = cv2.cvtColor(res, cv2.COLOR_BGR2GRAY)
     #colorArea = cv2.medianBlur(colorArea, 3)
     #colorArea = np.where(hsv[:, :, 0] == colorValue_H,
     #                     hsv[:, :, 0], 0)  # 진환이가 만들어준 남은 이미지들로 바꾸기
     
-    '''
-    cv2.imshow("colorArea", colorArea)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    '''
+
     x = 0
     y = 0
     # no legend, start from index 50 to avoid matching to chart title
@@ -228,11 +189,7 @@ def template_finding(img, res, bar_colors, maxsize_template):
     #np.all([maxsize_template[:,:,0] == 0,maxsize_template[:,:,1] == 0,maxsize_template[:,:,2] == 0]) 
     vertex = np.array([x_alongy - x, template.shape[0]])
     #print(template.shape)
-    '''
-    cv2.imshow("template", template)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
-    '''
+
     # template: head template image
     # vertex: coordinate difference between the bottom vertex and the template left-top vertex
     return template, vertex
@@ -254,6 +211,7 @@ def run(filename):
     # img_in.show()
     # img = np.array(img_in)
     img = cv2.imread('data/' + filename + '.png', cv2.IMREAD_COLOR)
+    dst = img.copy()
     result, background, number_colors, bar_colors, _ = Hcolor.color_find(
         img)  # , number_colors)
     back = Image.fromarray(background)
@@ -289,12 +247,17 @@ def run(filename):
         template_coordinate.append(coord)
         image_name = folder+"/matched_image_%i.png" % i
         cv2.imwrite(image_name, matched_image)
-        
-        cv2.imshow("matched image", matched_image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
 
+        for i in range(coord.shape[1]):
+            coord[:,i] -= vertex
+        h, w, _ = template.shape
+        for i in range(coord.shape[1]):
+            cv2.rectangle(dst, (coord[0][i], coord[1][i]),
+                        (coord[0][i] + w, coord[1][i] + h), (0, 0, 0), 2)
 
+    cv2.imshow("Head Detection", dst)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
     # template_coordinate is the bottom vertex coordinate of the detected head
     print(template_coordinate)
     return template_coordinate
