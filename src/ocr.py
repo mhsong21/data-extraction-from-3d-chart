@@ -43,8 +43,8 @@ def distance(p1, p2):
     return np.sqrt((x2-x1)**2 + (y2-y1)**2)
 
 
-def draw_boxes(img, boxinfosList, lineList):
-    newimg = Image.fromarray(np.array(img))
+def draw_boxes(path, boxinfosList, lineList):
+    newimg = Image.open(path).convert('RGB')
     draw = ImageDraw.Draw(newimg)
     for line, boxinfos in zip(lineList, boxinfosList):
         print(line)
@@ -54,7 +54,7 @@ def draw_boxes(img, boxinfosList, lineList):
             draw.rectangle([x0, y0, x1, y1], outline='black')
             # draw.text((x0+15, y0-20), str(int(line.line_dist(box))))
 
-    plt.imshow(newimg, cmap='gray')
+    plt.imshow(newimg)
     plt.show()
 
 
@@ -145,7 +145,7 @@ def tick_to_value(chart_path, box_path, axis_list):
         dbox_list.append(d_box_avg)
         tickval_per_lines.append(tickval_list)
         visualizelistList.append(visualizelist)
-    draw_boxes(img, visualizelistList, lineinfos)
+    draw_boxes(chart_path, visualizelistList, lineinfos)
     print(tickval_per_lines)
 
     return tickval_per_lines, dbox_list
