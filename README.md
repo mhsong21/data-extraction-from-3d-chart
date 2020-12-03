@@ -19,12 +19,13 @@ pip install -r requirements.txt
 ```
 
 ## Sample Result
-- input data
+#### input data
 ![Input](data/Matlab27.png)
 
-- predicted data
+#### predicted data
 ![Result](resource/sample_result.png)
 
+#### Mean error rate
 ```
 ----------Ground truth data----------
     1   2    3    4
