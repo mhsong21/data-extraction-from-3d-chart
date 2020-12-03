@@ -103,8 +103,8 @@ def color_find(img):  # , num_colors):
     # background : background with no bars
     # num_colors : number of color bars
     # colors : Bars color value in list of tuple (H,S)
-    bshow = Image.fromarray(result[0]+result[4])
-    bshow.show()
+    # bshow = Image.fromarray(result[0]+result[4])
+    # bshow.show()
     #print(bottomline_interval)
     return result, background, num_colors, colors, bottomline_interval
 

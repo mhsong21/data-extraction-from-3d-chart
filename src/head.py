@@ -265,6 +265,8 @@ def run(filename):
         for i in range(coord.shape[1]):
             cv2.rectangle(dst, (coord[0][i], coord[1][i]),
                         (coord[0][i] + w, coord[1][i] + h), (0, 0, 0), 2)
+        for i in range(coord.shape[1]):
+            coord[:,i] += vertex
 
     cv2.imshow("Head Detection", dst)
     cv2.waitKey(0)
