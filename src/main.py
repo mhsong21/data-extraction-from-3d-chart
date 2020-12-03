@@ -56,11 +56,19 @@ def main(filename):
     for temp_coord in template_coordinate:
         y_len = max(y_len, len(temp_coord[0]))
 
-    if x_len > len(result[1]):
-        result[1].extend(["miss"] * (x_len - len(result[1])))
+    xaxis = []
+    for i in range(x_len):
+        if i < len(result[1]):
+            xaxis.append(result[1][i])
+        else:
+            xaxis.append("miss")
 
-    if y_len > len(result[2]):
-        result[2].extend(["miss"] * (y_len - len(result[2])))
+    yaxis = []
+    for i in range(y_len):
+        if i < len(result[2]):
+            yaxis.append(result[2][i])
+        else:
+            yaxis.append("miss")
 
     coord_map = np.zeros((x_len, y_len, 2))
     data_map = np.zeros((x_len, y_len))
@@ -82,6 +90,9 @@ def main(filename):
         len_points = len(points)
         jd = 0
         for j, point in enumerate(points):
+            if i >= x_len or (j+jd) >= y_len:
+                continue
+
             h_px, yp0 = line.height(point)
             h_val = h_px * tick_val / tick_px
             coord_map[i, j+jd] = point
@@ -96,6 +107,8 @@ def main(filename):
                 n = int(round(dist / min_delta))
 
                 for k in range(n-1):
+                    if (j+jd+k+1) >= y_len:
+                        continue
                     coord_map[i, j+jd+k+1, :] = None
                     data_map[i, j+jd+k+1] = math.nan
                 jd += n - 1
@@ -105,8 +118,8 @@ def main(filename):
             data_map[i, len_points + jd:] = math.nan
 
     print(data_map)
-    save_predict_as_csv(result[1], reversed(result[2]), data_map.T, predict_path)
-    draw_values(chart_path, data_map, coord_map)
+    save_predict_as_csv(xaxis, reversed(yaxis), data_map.T, predict_path)
+    # draw_values(chart_path, data_map, coord_map)
 
 
 def find_delta(points, line):
