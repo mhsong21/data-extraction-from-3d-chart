@@ -26,7 +26,7 @@ pip install -r requirements.txt
 <img src="resource/sample_result.png" width=600>
 
 
-#### Mean error rate
+### Mean error rate
 ```
 ----------Ground truth data----------
     1   2    3    4
