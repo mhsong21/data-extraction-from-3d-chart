@@ -19,7 +19,7 @@ def template_matching(img, res, template, min_interval, vertex):
     src = res
     dst = img.copy()
     result = cv2.matchTemplate(src, template, cv2.TM_CCOEFF_NORMED)
-    print(min_interval)
+    # print(min_interval)
     # using threshold
     threshold = 0.9
     loc = np.where(result >= threshold)
@@ -113,7 +113,7 @@ def template_matching(img, res, template, min_interval, vertex):
     for i in range(coord.shape[1]):
         for j in range(coord.shape[1]):
             if coord[0][j] - min(template.shape[1], min_interval*5) <= coord[0][i] <= coord[0][j] + min(template.shape[1], min_interval*5):
-                if result[coord[1][j]][coord[0][j]] > result[coord[1][i]][coord[0][i]]:
+                if result[coord[1][j]][coord[0][j]] >= result[coord[1][i]][coord[0][i]]:
                     coordinate[:, i] = coord[:, j]
     coordinate = np.unique(coordinate, axis=1)
 
@@ -131,11 +131,11 @@ def template_matching(img, res, template, min_interval, vertex):
     
     for i in range(coordinate.shape[1]):
         coordinate[:,i] += vertex
-
+    
     cv2.imshow("dst", dst)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
+    
     return dst, coordinate, min_interval
 
 
@@ -158,11 +158,11 @@ def template_finding(img, res, bar_colors, maxsize_template):
     #colorArea = np.where(hsv[:, :, 0] == colorValue_H,
     #                     hsv[:, :, 0], 0)  # 진환이가 만들어준 남은 이미지들로 바꾸기
     
-
+    '''
     cv2.imshow("colorArea", colorArea)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
-
+    '''
     x = 0
     y = 0
     # no legend, start from index 50 to avoid matching to chart title
@@ -228,9 +228,11 @@ def template_finding(img, res, bar_colors, maxsize_template):
     #np.all([maxsize_template[:,:,0] == 0,maxsize_template[:,:,1] == 0,maxsize_template[:,:,2] == 0]) 
     vertex = np.array([x_alongy - x, template.shape[0]])
     #print(template.shape)
+    '''
     cv2.imshow("template", template)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
+    '''
     # template: head template image
     # vertex: coordinate difference between the bottom vertex and the template left-top vertex
     return template, vertex
