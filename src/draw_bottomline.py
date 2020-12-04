@@ -46,7 +46,7 @@ def main(filename, axis_points, degrees, dbox):
         print(lines)
         img = cv2.line(img, lines[0], lines[1], (0, 0, 255), 1)
     
-    axis.show_wait_destroy("img_with_bottomlines", img)
+    # axis.show_wait_destroy("img_with_bottomlines", img)
 
     lineinfos = [LineInfo(x[0] + x[1]) for x in bottom_line]
     return lineinfos

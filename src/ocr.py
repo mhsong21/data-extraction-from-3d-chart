@@ -146,7 +146,7 @@ def tick_to_value(chart_path, box_path, axis_list):
         dbox_list.append(d_box_avg)
         tickval_per_lines.append(tickval_list)
         visualizelistList.append(visualizelist)
-    draw_boxes(chart_path, visualizelistList, lineinfos)
+    # draw_boxes(chart_path, visualizelistList, lineinfos)
     print(tickval_per_lines)
 
     return tickval_per_lines, dbox_list
