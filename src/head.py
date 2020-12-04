@@ -216,12 +216,12 @@ def run(filename):
     result, background, number_colors, bar_colors, _ = Hcolor.color_find(
         img)  # , number_colors)
     
-    cols = 3
-    rows = number_colors // 3 + 1
-    fig, axes = plt.subplots(ncols=cols, nrows=rows)
-    for i in range(number_colors):
-        axes[i // 3][i % 3].imshow(result[i])
-    plt.show()
+    # cols = 3
+    # rows = number_colors // 3 + 1
+    # fig, axes = plt.subplots(ncols=cols, nrows=rows)
+    # for i in range(number_colors):
+    #     axes[i // 3][i % 3].imshow(result[i])
+    # plt.show()
 
     back = Image.fromarray(background)
     back.save("color_divided/" + filename + "background.png")
@@ -268,9 +268,9 @@ def run(filename):
         for i in range(coord.shape[1]):
             coord[:,i] += vertex
 
-    cv2.imshow("Head Detection", dst)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.imshow("Head Detection", dst)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
     # template_coordinate is the bottom vertex coordinate of the detected head
     print(template_coordinate)
     return template_coordinate

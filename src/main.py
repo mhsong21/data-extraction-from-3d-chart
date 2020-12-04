@@ -41,15 +41,26 @@ def main(filename):
     zaxis = result[0]
     tick_val = 0.0
     tick_px = float(dbox[0])
+    delta_dic = {}
     for i in range(len(zaxis)-1):
-        z1 = zaxis[i+1]
-        z0 = zaxis[i]
-        if z1 is not None and z0 is not None:
-            tick_val = float(z1 - z0)
-            break
+        try:
+            z1 = zaxis[i+1]
+            z0 = zaxis[i]
+            if z1 is not None and z0 is not None:
+                tick_val = float(z1 - z0)
+                delta_dic.setdefault(tick_val, 0)
+                delta_dic[tick_val] += 1
+        except:
+            continue
 
-    bottom_line = draw_bottomline.main(filename, axis_points, degrees, dbox)
+    maxcnt = 0
+    for val, cnt in delta_dic.items():
+        if cnt > maxcnt:
+            tick_val = val
+            maxcnt = cnt
+
     template_coordinate = head.run(filename)
+    bottom_line = draw_bottomline.main(filename, axis_points, degrees, dbox)
 
     x_len = len(bottom_line)
     y_len = -1

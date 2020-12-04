@@ -1,16 +1,23 @@
 # Automated data extraction from​ 3D bar chart images​
 
-
 ## Overview of the Algorithm
 ![Algorithm](resource/algorithm.png)
-
 
 ## Environment
 
 python 3.8.5 with virtualenv
 
-
 ## Project Setup
+
+1. Clone the repo and update submodule  
+`git clone --recurse-submodules <https://github.com/sniaw21/data-extraction-from-3d-chart.git>`  
+or clone the repository first, and  
+`git submodule update --remote --merge`
+
+2. Download tessract-ocr below  
+<https://tesseract-ocr.github.io/tessdoc/Downloads.html>
+
+3. Python environment setup
 
 ```bash
 virtualenv .venv
@@ -24,7 +31,6 @@ pip install -r requirements.txt
 
 ### predicted data
 <img src="resource/sample_result.png" width=600>
-
 
 ### Mean error rate
 ```
