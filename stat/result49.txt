@@ -1,0 +1,29 @@
+----------Ground truth data----------
+     1    2    3    4    5    6    7    8    9   10
+1  498  374  349  156  223   26  300  226  230  254
+2  327  332  260  115  378  234  225  276  480  100
+3   55  262   30  326  302  163   18  403  396  214
+4   19  130  446   34  392  316  257  351  226   85
+5  310  481  166  138   57  116  204  437  167  376
+6  284  271  115  141  490  290   55   27   30  185
+7  481   16   57  441  425  302  230  110  371  471
+-------------------------------------
+
+-----------Predicted data------------
+               1           2           3  ...           8           9          10
+miss  491.646631  377.203107  347.935782  ...  226.988408  230.240333  248.438994
+miss         NaN  375.264071         NaN  ...         NaN         NaN         NaN
+miss         NaN         NaN         NaN  ...         NaN         NaN         NaN
+miss         NaN         NaN         NaN  ...         NaN         NaN         NaN
+miss         NaN         NaN         NaN  ...         NaN         NaN         NaN
+1            NaN         NaN         NaN  ...         NaN         NaN         NaN
+2            NaN         NaN         NaN  ...         NaN         NaN         NaN
+4            NaN         NaN         NaN  ...         NaN         NaN         NaN
+3            NaN         NaN         NaN  ...         NaN         NaN         NaN
+5            NaN         NaN         NaN  ...         NaN         NaN         NaN
+6            NaN         NaN         NaN  ...         NaN         NaN         NaN
+7            NaN         NaN         NaN  ...         NaN         NaN         NaN
+
+[12 rows x 10 columns]
+-------------------------------------
+

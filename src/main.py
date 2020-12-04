@@ -44,8 +44,8 @@ def main(filename):
     delta_dic = {}
     for i in range(len(zaxis)-1):
         try:
-            z1 = float(zaxis[i+1])
-            z0 = float(zaxis[i])
+            z1 = zaxis[i+1]
+            z0 = zaxis[i]
             if z1 is not None and z0 is not None:
                 tick_val = float(z1 - z0)
                 delta_dic.setdefault(tick_val, 0)
@@ -57,7 +57,7 @@ def main(filename):
     for val, cnt in delta_dic.items():
         if cnt > maxcnt:
             tick_val = val
-            cnt = maxcnt
+            maxcnt = cnt
 
     template_coordinate = head.run(filename)
     bottom_line = draw_bottomline.main(filename, axis_points, degrees, dbox)
