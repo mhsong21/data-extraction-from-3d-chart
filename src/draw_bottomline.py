@@ -12,9 +12,8 @@ from box_info import LineInfo
 # INPUT
 # axis_points : list of (start,end). Ordered in z, 계열, rest (from axis.py)
 # degrees : list of degrees of each axis. Ordered in z, 계열, rest (from axis.py)
-# num_colors : number of colors i.e. number of 계열 (from ocr.py)
-# delta_box : list of delta distance bewteen ticks. Ordered in z, 계열, rest(from ocr.py)
-
+# num_colors : number of colors i.e. number of series (from Hcolor.py)
+# delta_box : list of distance bewteen series. (from Hcolor.py)
 
 def draw_bottomline(axis_points, degrees, num_colors, delta_box):
     start = axis_points[2][0]

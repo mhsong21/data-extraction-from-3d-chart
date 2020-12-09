@@ -13,9 +13,11 @@ def color_find(img):  # , num_colors):
     hist = cv2.calcHist([hsv], [0, 1], None, [180, 256], [0, 180, 0, 256])
     whites = np.unravel_index(hist.argmax(), hist.shape)
     hist[whites] = 0
-    # plt.imshow(hist, interpolation='nearest')
-    # plt.show()
-    #maxi = ndimage.maximum_filter(hist, size=(1, 1))
+    
+    #plot HS histogram
+    #plt.imshow(hist, interpolation='nearest')
+    #plt.show()
+
     M = np.max(hist)
     val = np.unique(hist)
     cnt = 0
@@ -50,34 +52,14 @@ def color_find(img):  # , num_colors):
     print("number: ", num_colors)
     print(colors)
 
-    H = np.sum(hist, axis= 0)
-    # most_colors = np.argpartition(H, -(num_colors+1));
-    # most_colors.astype(np.uint8)
-    # visualize H histogram
-    # plt.plot(H,color= (0,0.5,0.5))
-    # plt.show()
-
-    # Background image
-    # Assumtion: Background image consist with only white
+    # Background image with achromatic colors
     back = cv2.inRange(hsv, (0, 0, 0), (180, 0, 255))
     background = cv2.bitwise_and(img, img, mask=back)
-    # backshow = Image.fromarray(background)
-    # backshow.show()
-    # define range of most colors in HSV
-    # for i in range(num_colors):
-    #     clr_low = (int(most_colors[-2-i]-1), 0, 0)
-    #     clr_up = (int(most_colors[-2-i]+1),255,255)
-    #     mask = cv.inRange(hsv, clr_low, clr_up)
-    #     res = cv.bitwise_and(img,img, mask= mask)
-    #     result.append(res+background)
 
-    # res_out = Image.fromarray(res + background)
-    # res_out.show()
     color_order = []
     for i in range(num_colors):
         clr_low = (int(colors[i][0]-3), int(colors[i][1]-3), 0)
         clr_up = (int(colors[i][0]+3), int(colors[i][1]+3), 255)
-        # print(clr_low, clr_up)
         mask = cv2.inRange(hsv, clr_low, clr_up)
         mask = cv2.medianBlur(mask,3) 
         height, width = mask.shape
@@ -89,7 +71,6 @@ def color_find(img):  # , num_colors):
                     maxy = y
                     maxx = x
         res = cv2.bitwise_and(img, img, mask=mask)
-        #res = cv2.medianBlur(res, 3)
         color_order.append((maxy,maxx,res,colors[i]))
     color_sort = sorted(color_order, key = lambda x:x[0], reverse = True)
     bottomline_interval = []
@@ -99,13 +80,12 @@ def color_find(img):  # , num_colors):
     #bottomline_interval = bottomline_interval/(num_colors-1)
     result = [x[2] for x in color_sort]
     colors = [x[3] for x in color_sort]
-    # result : color bars
+    
+    # result : separated single series
     # background : background with no bars
     # num_colors : number of color bars
-    # colors : Bars color value in list of tuple (H,S)
-    # bshow = Image.fromarray(result[0]+result[4])
-    # bshow.show()
-    #print(bottomline_interval)
+    # colors : Color info of series in list of tuple (H,S)
+    # bottomline_interval : distance between series
     return result, background, num_colors, colors, bottomline_interval
 
 
